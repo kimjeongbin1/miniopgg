@@ -13,7 +13,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Mini OP.GG 메인</title>
+<title>Mini OP.GG 메인 오빠 바보</title>
 
 
 <style>
