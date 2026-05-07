@@ -15,6 +15,7 @@
 <meta charset="UTF-8">
 <title>Mini OP.GG 메인</title>
 
+
 <style>
     body {
         margin: 0;
