@@ -3,9 +3,10 @@
 <%@ page import="util.DBUtil" %>
 
 <%
+    Integer loginUserId = (Integer) session.getAttribute("user_id");
     String nickname = (String) session.getAttribute("nickname");
 
-    if (nickname == null) {
+    if (loginUserId == null) {
         response.sendRedirect(request.getContextPath() + "/user/login.jsp");
         return;
     }
@@ -20,10 +21,9 @@
     String writer = "";
     Timestamp createdAt = null;
     int viewCount = 0;
+    int writerUserId = 0;
 
-    try (
-        Connection conn = DBUtil.getConnection()
-    ) {
+    try (Connection conn = DBUtil.getConnection()) {
         PreparedStatement updatePs = conn.prepareStatement(updateSql);
         updatePs.setInt(1, postId);
         updatePs.executeUpdate();
@@ -38,6 +38,7 @@
             writer = rs.getString("writer");
             createdAt = rs.getTimestamp("created_at");
             viewCount = rs.getInt("view_count");
+            writerUserId = rs.getInt("user_id");
         } else {
             out.println("존재하지 않는 게시글입니다.");
             return;
@@ -48,6 +49,8 @@
         out.println("오류 발생");
         return;
     }
+
+    boolean isOwner = loginUserId == writerUserId;
 %>
 
 <!DOCTYPE html>
@@ -73,6 +76,15 @@
 <hr>
 
 <a href="<%= request.getContextPath() %>/board/board.jsp">목록으로</a>
+
+<% if (isOwner) { %>
+    <a href="<%= request.getContextPath() %>/board/edit.jsp?post_id=<%= postId %>">수정</a>
+
+    <form action="<%= request.getContextPath() %>/deletePost" method="post" style="display:inline;">
+        <input type="hidden" name="post_id" value="<%= postId %>">
+        <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+    </form>
+<% } %>
 
 </body>
 </html>
