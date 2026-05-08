@@ -86,5 +86,59 @@
     </form>
 <% } %>
 
+<hr>
+
+<h2>댓글</h2>
+
+<form action="<%= request.getContextPath() %>/addComment" method="post">
+    <input type="hidden" name="post_id" value="<%= postId %>">
+
+    <textarea name="content" rows="3" cols="70" required placeholder="댓글을 입력하세요"></textarea><br>
+
+    <button type="submit">댓글 등록</button>
+</form>
+
+<hr>
+
+<%
+    String commentSql = "SELECT * FROM comments WHERE post_id = ? ORDER BY comment_id DESC";
+
+    try (
+        Connection conn = DBUtil.getConnection();
+        PreparedStatement ps = conn.prepareStatement(commentSql)
+    ) {
+        ps.setInt(1, postId);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            int commentId = rs.getInt("comment_id");
+            int commentUserId = rs.getInt("user_id");
+%>
+
+<div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+    <p>
+        <strong><%= rs.getString("writer") %></strong>
+        / <%= rs.getTimestamp("created_at") %>
+    </p>
+
+    <p><%= rs.getString("content").replace("\n", "<br>") %></p>
+
+    <% if (loginUserId == commentUserId) { %>
+        <form action="<%= request.getContextPath() %>/deleteComment" method="post" style="display:inline;">
+            <input type="hidden" name="comment_id" value="<%= commentId %>">
+            <input type="hidden" name="post_id" value="<%= postId %>">
+            <button type="submit" onclick="return confirm('댓글을 삭제하시겠습니까?');">댓글 삭제</button>
+        </form>
+    <% } %>
+</div>
+
+<%
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        out.println("댓글을 불러오지 못했습니다.");
+    }
+%>
+
 </body>
 </html>
