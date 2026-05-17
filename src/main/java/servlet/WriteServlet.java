@@ -22,6 +22,7 @@ public class WriteServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html; charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession();
 
@@ -33,10 +34,11 @@ public class WriteServlet extends HttpServlet {
             return;
         }
 
+        String category = request.getParameter("category");
         String title = request.getParameter("title");
         String content = request.getParameter("content");
 
-        String sql = "INSERT INTO board(title, content, user_id, writer) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO board(title, content, user_id, writer, category) VALUES (?, ?, ?, ?, ?)";
 
         try (
             Connection conn = DBUtil.getConnection();
@@ -46,6 +48,7 @@ public class WriteServlet extends HttpServlet {
             ps.setString(2, content);
             ps.setInt(3, userId);
             ps.setString(4, nickname);
+            ps.setString(5, category);
 
             ps.executeUpdate();
 
@@ -53,6 +56,7 @@ public class WriteServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
+
             response.getWriter().println("<script>");
             response.getWriter().println("alert('글 등록 실패');");
             response.getWriter().println("history.back();");
