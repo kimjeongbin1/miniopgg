@@ -1,20 +1,27 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.sql.*" %>
-<%@ page import="util.DBUtil" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*"%>
+<%@ page import="util.DBUtil"%>
 
 <%
-    String nickname = (String) session.getAttribute("nickname");
+String nickname=(String)session.getAttribute("nickname");
 
-    if (nickname == null) {
-        response.sendRedirect(request.getContextPath() + "/user/login.jsp");
-        return;
-    }
+if(nickname==null){
+    response.sendRedirect(
+    request.getContextPath()+"/user/login.jsp");
+    return;
+}
 
-    String searchType = request.getParameter("searchType");
-    String keyword = request.getParameter("keyword");
+String sort=request.getParameter("sort");
 
-    if (searchType == null) searchType = "title_content";
-    if (keyword == null) keyword = "";
+if(sort==null){
+    sort="popular";
+}
+
+String keyword=request.getParameter("keyword");
+
+if(keyword==null){
+    keyword="";
+}
 %>
 
 <!DOCTYPE html>
@@ -22,114 +29,304 @@
 <head>
 <meta charset="UTF-8">
 <title>게시판</title>
+
+<style>
+
+body{
+
+width:1000px;
+margin:auto;
+font-family:Arial;
+
+}
+
+.top{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+margin-bottom:20px;
+
+}
+
+.tab{
+
+margin-bottom:20px;
+
+}
+
+.tab a{
+
+padding:10px 15px;
+
+text-decoration:none;
+
+border:1px solid #ddd;
+
+color:black;
+
+margin-right:5px;
+
+border-radius:8px;
+
+}
+
+.active{
+
+background:#4f8cff;
+color:white!important;
+
+}
+
+table{
+
+width:100%;
+border-collapse:collapse;
+
+}
+
+th,td{
+
+padding:12px;
+border-bottom:1px solid #ddd;
+
+text-align:center;
+
+}
+
+.title{
+
+text-align:left;
+
+}
+
+</style>
+
 </head>
+
 <body>
+
+<div class="top">
 
 <h1>게시판</h1>
 
-<p><%= nickname %>님 환영합니다.</p>
+<div>
 
-<a href="<%= request.getContextPath() %>/board/write.jsp">글쓰기</a>
-<a href="<%= request.getContextPath() %>/main.jsp">메인으로</a>
-<a href="<%= request.getContextPath() %>/logout">로그아웃</a>
+<%=nickname%>님 환영합니다
 
-<hr>
+<a href="<%=request.getContextPath()%>/user/mypage.jsp">
 
-<form action="<%= request.getContextPath() %>/board/board.jsp" method="get">
-    <select name="searchType">
-        <option value="title_content" <%= searchType.equals("title_content") ? "selected" : "" %>>제목+내용</option>
-        <option value="title" <%= searchType.equals("title") ? "selected" : "" %>>제목</option>
-        <option value="writer" <%= searchType.equals("writer") ? "selected" : "" %>>작성자</option>
-        <option value="category" <%= searchType.equals("category") ? "selected" : "" %>>카테고리</option>
-    </select>
+👤 마이페이지
 
-    <input type="text" name="keyword" value="<%= keyword %>" placeholder="검색어 입력">
-    <button type="submit">검색</button>
-    <a href="<%= request.getContextPath() %>/board/board.jsp">전체보기</a>
+</a>
+
+<a href="<%=request.getContextPath()%>/logout">
+
+로그아웃
+
+</a>
+
+</div>
+
+</div>
+
+<div class="tab">
+
+<a
+class="<%=sort.equals("popular")?"active":""%>"
+href="<%=request.getContextPath()%>/board/board.jsp?sort=popular">
+
+🔥 인기
+
+</a>
+
+<a
+class="<%=sort.equals("latest")?"active":""%>"
+href="<%=request.getContextPath()%>/board/board.jsp?sort=latest">
+
+🕒 최신
+
+</a>
+
+<a
+class="<%=sort.equals("views")?"active":""%>"
+href="<%=request.getContextPath()%>/board/board.jsp?sort=views">
+
+👁 조회수
+
+</a>
+
+<a href="<%=request.getContextPath()%>/board/write.jsp">
+
+✏ 글쓰기
+
+</a>
+
+</div>
+
+<form method="get"
+action="<%=request.getContextPath()%>/board/board.jsp">
+
+<input
+type="hidden"
+name="sort"
+value="<%=sort%>">
+
+<input
+type="text"
+name="keyword"
+value="<%=keyword%>"
+placeholder="검색">
+
+<button>
+
+검색
+
+</button>
+
 </form>
 
-<hr>
+<br>
 
-<table border="1" width="900">
-    <tr>
-        <th>번호</th>
-        <th>카테고리</th>
-        <th>제목</th>
-        <th>작성자</th>
-        <th>작성일</th>
-        <th>조회수</th>
-    </tr>
+<table>
+
+<tr>
+
+<th>번호</th>
+<th>좋아요</th>
+<th>카테고리</th>
+<th>제목</th>
+<th>작성자</th>
+<th>조회수</th>
+<th>작성일</th>
+
+</tr>
 
 <%
-    String sql = "SELECT * FROM board";
 
-    if (!keyword.trim().equals("")) {
-        if (searchType.equals("title")) {
-            sql += " WHERE title LIKE ?";
-        } else if (searchType.equals("writer")) {
-            sql += " WHERE writer LIKE ?";
-        } else if (searchType.equals("category")) {
-            sql += " WHERE category LIKE ?";
-        } else {
-            sql += " WHERE title LIKE ? OR content LIKE ?";
-        }
-    }
+String sql=
 
-    sql += " ORDER BY post_id DESC";
+"SELECT b.*,COUNT(l.like_id) AS like_count " +
+"FROM board b " +
 
-    try (
-        Connection conn = DBUtil.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)
-    ) {
-        if (!keyword.trim().equals("")) {
-            if (searchType.equals("title_content")) {
-                ps.setString(1, "%" + keyword + "%");
-                ps.setString(2, "%" + keyword + "%");
-            } else {
-                ps.setString(1, "%" + keyword + "%");
-            }
-        }
+"LEFT JOIN likes l " +
 
-        ResultSet rs = ps.executeQuery();
+"ON b.post_id=l.post_id ";
 
-        boolean hasPost = false;
+if(!keyword.trim().equals("")){
 
-        while (rs.next()) {
-            hasPost = true;
+sql+="WHERE title LIKE ? ";
+
+}
+
+sql+=
+
+"GROUP BY b.post_id ";
+
+if(sort.equals("latest")){
+
+sql+=
+"ORDER BY b.created_at DESC";
+
+}
+else if(sort.equals("views")){
+
+sql+=
+"ORDER BY b.view_count DESC";
+
+}
+else{
+
+sql+=
+"ORDER BY like_count DESC,b.view_count DESC,b.created_at DESC";
+
+}
+
+try(
+
+Connection conn=
+DBUtil.getConnection();
+
+PreparedStatement ps=
+conn.prepareStatement(sql)
+
+){
+
+if(!keyword.trim().equals("")){
+
+ps.setString(
+1,
+"%"+keyword+"%"
+);
+
+}
+
+ResultSet rs=
+ps.executeQuery();
+
+while(rs.next()){
+
 %>
-    <tr>
-        <td><%= rs.getInt("post_id") %></td>
-        <td><%= rs.getString("category") %></td>
-        <td>
-            <a href="<%= request.getContextPath() %>/board/detail.jsp?post_id=<%= rs.getInt("post_id") %>">
-                <%= rs.getString("title") %>
-            </a>
-        </td>
-        <td><%= rs.getString("writer") %></td>
-        <td><%= rs.getTimestamp("created_at") %></td>
-        <td><%= rs.getInt("view_count") %></td>
-    </tr>
-<%
-        }
 
-        if (!hasPost) {
-%>
-    <tr>
-        <td colspan="6">게시글이 없습니다.</td>
-    </tr>
-<%
-        }
+<tr>
 
-        rs.close();
+<td>
 
-    } catch (Exception e) {
-        e.printStackTrace();
-%>
-    <tr>
-        <td colspan="6">게시글을 불러오지 못했습니다.</td>
-    </tr>
+<%=rs.getInt("post_id")%>
+
+</td>
+
+<td>
+
+👍 <%=rs.getInt("like_count")%>
+
+</td>
+
+<td>
+
+<%=rs.getString("category")%>
+
+</td>
+
+<td class="title">
+
+<a href="<%=request.getContextPath()%>/board/detail.jsp?post_id=<%=rs.getInt("post_id")%>">
+
+<%=rs.getString("title")%>
+
+</a>
+
+</td>
+
+<td>
+
+<%=rs.getString("writer")%>
+
+</td>
+
+<td>
+
+<%=rs.getInt("view_count")%>
+
+</td>
+
+<td>
+
+<%=rs.getTimestamp("created_at")%>
+
+</td>
+
+</tr>
+
 <%
-    }
+}
+
+}catch(Exception e){
+
+e.printStackTrace();
+
+}
 %>
 
 </table>
