@@ -15,26 +15,69 @@
 <head>
 <meta charset="UTF-8">
 <title>글쓰기</title>
+
+<style>
+body{
+    font-family: Arial;
+    width:800px;
+    margin:auto;
+}
+
+input,select,textarea{
+    width:100%;
+    margin-bottom:15px;
+    padding:10px;
+}
+
+button{
+    padding:10px 20px;
+}
+</style>
+
 </head>
 <body>
 
 <h1>글쓰기</h1>
 
 <form action="<%= request.getContextPath() %>/write" method="post">
-    <p>작성자: <%= nickname %></p>
 
     <p>
-        제목<br>
-        <input type="text" name="title" required style="width:500px;">
+        작성자 :
+        <b><%= nickname %></b>
     </p>
 
     <p>
-        내용<br>
-        <textarea name="content" rows="12" cols="70" required></textarea>
+        게시판 종류
+        <select name="category">
+            <option value="자유">자유 게시판</option>
+            <option value="질문">질문 게시판</option>
+            <option value="비밀">비밀 게시판</option>
+        </select>
+    </p>
+
+    <p>
+        제목
+        <input type="text"
+               name="title"
+               placeholder="제목 입력"
+               required>
+    </p>
+
+    <p>
+        내용
+        <textarea name="content"
+                  rows="10"
+                  placeholder="내용 입력"
+                  required></textarea>
     </p>
 
     <button type="submit">등록</button>
-    <a href="<%= request.getContextPath() %>/board/board.jsp">취소</a>
+
+    <button type="button"
+    onclick="location.href='<%= request.getContextPath()%>/board/board.jsp'">
+    취소
+    </button>
+
 </form>
 
 </body>
