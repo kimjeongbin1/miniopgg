@@ -22,7 +22,12 @@ if (keyword == null) {
 
 String searchType = request.getParameter("searchType");
 if (searchType == null) {
-    searchType = "all";
+    searchType = "titleContent";
+}
+
+String category = request.getParameter("category");
+if (category == null) {
+    category = "";
 }
 %>
 
@@ -79,6 +84,27 @@ body {
     width: 250px;
 }
 
+.category-filter {
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.category-link {
+    color: #4f8cff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.category-link:hover {
+    text-decoration: underline;
+}
+
+.clear-category {
+    margin-left: 10px;
+    color: red;
+    text-decoration: none;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -111,35 +137,40 @@ th, td {
 
 <div class="tab">
     <a class="<%= sort.equals("popular") ? "active" : "" %>"
-       href="<%= request.getContextPath() %>/board/board.jsp?sort=popular">🔥 인기</a>
+       href="<%= request.getContextPath() %>/board/board.jsp?sort=popular&searchType=<%= searchType %>&keyword=<%= keyword %>&category=<%= category %>">🔥 인기</a>
 
     <a class="<%= sort.equals("latest") ? "active" : "" %>"
-       href="<%= request.getContextPath() %>/board/board.jsp?sort=latest">🕒 최신</a>
+       href="<%= request.getContextPath() %>/board/board.jsp?sort=latest&searchType=<%= searchType %>&keyword=<%= keyword %>&category=<%= category %>">🕒 최신</a>
 
     <a class="<%= sort.equals("views") ? "active" : "" %>"
-       href="<%= request.getContextPath() %>/board/board.jsp?sort=views">👁 조회수</a>
+       href="<%= request.getContextPath() %>/board/board.jsp?sort=views&searchType=<%= searchType %>&keyword=<%= keyword %>&category=<%= category %>">👁 조회수</a>
 
     <a href="<%= request.getContextPath() %>/board/write.jsp">✏ 글쓰기</a>
 </div>
 
 <form class="search-box" method="get" action="<%= request.getContextPath() %>/board/board.jsp">
     <input type="hidden" name="sort" value="<%= sort %>">
+    <input type="hidden" name="category" value="<%= category %>">
 
     <select name="searchType">
-        <option value="all" <%= searchType.equals("all") ? "selected" : "" %>>
-            게시글내용+작성자
-        </option>
-        <option value="writer" <%= searchType.equals("writer") ? "selected" : "" %>>
-            작성자
-        </option>
-        <option value="content" <%= searchType.equals("content") ? "selected" : "" %>>
-            게시글 내용
-        </option>
+        <option value="titleContent" <%= searchType.equals("titleContent") ? "selected" : "" %>>제목+내용</option>
+        <option value="title" <%= searchType.equals("title") ? "selected" : "" %>>제목</option>
+        <option value="content" <%= searchType.equals("content") ? "selected" : "" %>>내용</option>
+        <option value="writer" <%= searchType.equals("writer") ? "selected" : "" %>>작성자</option>
     </select>
 
     <input type="text" name="keyword" value="<%= keyword %>" placeholder="검색">
     <button type="submit">검색</button>
 </form>
+
+<% if (!category.trim().equals("")) { %>
+<div class="category-filter">
+    현재 카테고리: <b><%= category %></b>
+    <a class="clear-category" href="<%= request.getContextPath() %>/board/board.jsp?sort=<%= sort %>&searchType=<%= searchType %>&keyword=<%= keyword %>">
+        전체보기
+    </a>
+</div>
+<% } %>
 
 <table>
 <tr>
@@ -167,14 +198,34 @@ String sql =
     "FROM board b " +
     "LEFT JOIN likes l ON b.post_id = l.post_id ";
 
+boolean hasWhere = false;
+
 if (!keyword.trim().equals("")) {
-    if (searchType.equals("writer")) {
-        sql += "WHERE b.writer LIKE ? ";
-    } else if (searchType.equals("content")) {
-        sql += "WHERE (b.title LIKE ? OR b.content LIKE ?) ";
-    } else {
-        sql += "WHERE (b.title LIKE ? OR b.content LIKE ? OR b.writer LIKE ?) ";
+    if (!hasWhere) {
+        sql += "WHERE ";
+        hasWhere = true;
     }
+
+    if (searchType.equals("title")) {
+        sql += "b.title LIKE ? ";
+    } else if (searchType.equals("content")) {
+        sql += "b.content LIKE ? ";
+    } else if (searchType.equals("writer")) {
+        sql += "b.writer LIKE ? ";
+    } else {
+        sql += "(b.title LIKE ? OR b.content LIKE ?) ";
+    }
+}
+
+if (!category.trim().equals("")) {
+    if (!hasWhere) {
+        sql += "WHERE ";
+        hasWhere = true;
+    } else {
+        sql += "AND ";
+    }
+
+    sql += "b.category = ? ";
 }
 
 sql +=
@@ -194,24 +245,30 @@ try (
     Connection conn = DBUtil.getConnection();
     PreparedStatement ps = conn.prepareStatement(sql)
 ) {
+    int index = 1;
+
     if (!keyword.trim().equals("")) {
         String searchKeyword = "%" + keyword + "%";
 
-        if (searchType.equals("all")) {
-            ps.setString(1, searchKeyword);
-            ps.setString(2, searchKeyword);
-            ps.setString(3, searchKeyword);
-        } else if (searchType.equals("content")) {
-            ps.setString(1, searchKeyword);
-            ps.setString(2, searchKeyword);
+        if (searchType.equals("titleContent")) {
+            ps.setString(index++, searchKeyword);
+            ps.setString(index++, searchKeyword);
         } else {
-            ps.setString(1, searchKeyword);
+            ps.setString(index++, searchKeyword);
         }
+    }
+
+    if (!category.trim().equals("")) {
+        ps.setString(index++, category);
     }
 
     ResultSet rs = ps.executeQuery();
 
     while (rs.next()) {
+        String postCategory = rs.getString("category");
+        if (postCategory == null || postCategory.trim().equals("")) {
+            postCategory = "자유";
+        }
 %>
 
 <tr>
@@ -220,7 +277,10 @@ try (
     <td>👍 <%= rs.getInt("like_count") %></td>
 
     <td>
-        <%= rs.getString("category") == null ? "자유" : rs.getString("category") %>
+        <a class="category-link"
+           href="<%= request.getContextPath() %>/board/board.jsp?sort=<%= sort %>&searchType=<%= searchType %>&keyword=<%= keyword %>&category=<%= postCategory %>">
+            <%= postCategory %>
+        </a>
     </td>
 
     <td class="title">
