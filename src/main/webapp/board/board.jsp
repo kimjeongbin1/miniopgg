@@ -11,24 +11,16 @@ if (nickname == null) {
 }
 
 String sort = request.getParameter("sort");
-if (sort == null) {
-    sort = "popular";
-}
+if (sort == null) sort = "popular";
 
 String keyword = request.getParameter("keyword");
-if (keyword == null) {
-    keyword = "";
-}
+if (keyword == null) keyword = "";
 
 String searchType = request.getParameter("searchType");
-if (searchType == null) {
-    searchType = "titleContent";
-}
+if (searchType == null) searchType = "titleContent";
 
 String category = request.getParameter("category");
-if (category == null) {
-    category = "";
-}
+if (category == null) category = "";
 %>
 
 <!DOCTYPE html>
@@ -42,6 +34,7 @@ body {
     width: 1000px;
     margin: auto;
     font-family: Arial;
+    padding-top: 60px;
 }
 
 .top {
@@ -124,28 +117,23 @@ th, td {
 
 <body>
 
+<jsp:include page="/common/header.jsp"/>
+
 <div class="top">
     <h1>게시판</h1>
-
-    <div>
-        <%= nickname %>님 환영합니다
-
-        <a href="<%= request.getContextPath() %>/user/mypage.jsp">👤 마이페이지</a>
-        <a href="<%= request.getContextPath() %>/logout">로그아웃</a>
-    </div>
 </div>
 
 <div class="tab">
     <a class="<%= sort.equals("popular") ? "active" : "" %>"
-       href="<%= request.getContextPath() %>/board/board.jsp?sort=popular&searchType=<%= searchType %>&keyword=<%= keyword %>&category=<%= category %>">🔥 인기</a>
+       href="<%= request.getContextPath() %>/board/board.jsp?sort=popular&searchType=<%= searchType %>&keyword=<%= keyword %>&category=<%= category %>">인기</a>
 
     <a class="<%= sort.equals("latest") ? "active" : "" %>"
-       href="<%= request.getContextPath() %>/board/board.jsp?sort=latest&searchType=<%= searchType %>&keyword=<%= keyword %>&category=<%= category %>">🕒 최신</a>
+       href="<%= request.getContextPath() %>/board/board.jsp?sort=latest&searchType=<%= searchType %>&keyword=<%= keyword %>&category=<%= category %>">최신</a>
 
     <a class="<%= sort.equals("views") ? "active" : "" %>"
-       href="<%= request.getContextPath() %>/board/board.jsp?sort=views&searchType=<%= searchType %>&keyword=<%= keyword %>&category=<%= category %>">👁 조회수</a>
+       href="<%= request.getContextPath() %>/board/board.jsp?sort=views&searchType=<%= searchType %>&keyword=<%= keyword %>&category=<%= category %>">조회수</a>
 
-    <a href="<%= request.getContextPath() %>/board/write.jsp">✏ 글쓰기</a>
+    <a href="<%= request.getContextPath() %>/board/write.jsp">글쓰기</a>
 </div>
 
 <form class="search-box" method="get" action="<%= request.getContextPath() %>/board/board.jsp">
@@ -274,7 +262,7 @@ try (
 <tr>
     <td><%= rs.getInt("post_id") %></td>
 
-    <td>👍 <%= rs.getInt("like_count") %></td>
+    <td>좋아요 <%= rs.getInt("like_count") %></td>
 
     <td>
         <a class="category-link"

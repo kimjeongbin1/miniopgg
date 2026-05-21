@@ -3,22 +3,22 @@
 <%@ page import="util.DBUtil" %>
 
 <%
-    Integer userId = (Integer) session.getAttribute("user_id");
+Integer userId = (Integer) session.getAttribute("user_id");
 
-    if (userId == null) {
-        response.sendRedirect(request.getContextPath() + "/user/login.jsp");
-        return;
-    }
+if (userId == null) {
+    response.sendRedirect(request.getContextPath() + "/user/login.jsp");
+    return;
+}
 
-    String loginId = "";
-    String nickname = "";
-    String email = "";
-    String name = "";
-    String phone = "";
-    Date birthdate = null;
-    String gender = "";
+String loginId = "";
+String nickname = "";
+String email = "";
+String name = "";
+String phone = "";
+Date birthdate = null;
+String gender = "";
 
-    String userSql = "SELECT * FROM users WHERE user_id = ?";
+String userSql = "SELECT * FROM users WHERE user_id = ?";
 %>
 
 <!DOCTYPE html>
@@ -26,37 +26,69 @@
 <head>
 <meta charset="UTF-8">
 <title>마이페이지</title>
+
+<style>
+body {
+    width: 900px;
+    margin: auto;
+    font-family: Arial;
+    padding-top: 60px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+th {
+    width: 150px;
+    background: #f5f5f5;
+}
+
+.menu a {
+    margin-right: 10px;
+}
+</style>
 </head>
+
 <body>
+
+<jsp:include page="/common/header.jsp"/>
 
 <h1>마이페이지</h1>
 
 <%
-    try (
-        Connection conn = DBUtil.getConnection();
-        PreparedStatement ps = conn.prepareStatement(userSql)
-    ) {
-        ps.setInt(1, userId);
-        ResultSet rs = ps.executeQuery();
+try (
+    Connection conn = DBUtil.getConnection();
+    PreparedStatement ps = conn.prepareStatement(userSql)
+) {
+    ps.setInt(1, userId);
+    ResultSet rs = ps.executeQuery();
 
-        if (rs.next()) {
-            loginId = rs.getString("login_id");
-            nickname = rs.getString("nickname");
-            email = rs.getString("email");
-            name = rs.getString("name");
-            phone = rs.getString("phone");
-            birthdate = rs.getDate("birthdate");
-            gender = rs.getString("gender");
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
-        out.println("회원정보를 불러오지 못했습니다.");
+    if (rs.next()) {
+        loginId = rs.getString("login_id");
+        nickname = rs.getString("nickname");
+        email = rs.getString("email");
+        name = rs.getString("name");
+        phone = rs.getString("phone");
+        birthdate = rs.getDate("birthdate");
+        gender = rs.getString("gender");
     }
+} catch (Exception e) {
+    e.printStackTrace();
+    out.println("회원정보를 불러오지 못했습니다.");
+}
 %>
 
 <h2>내 회원정보</h2>
 
-<table border="1">
+<table>
     <tr>
         <th>아이디</th>
         <td><%= loginId %></td>
@@ -87,16 +119,18 @@
     </tr>
 </table>
 
-<br>
-
-<a href="<%= request.getContextPath() %>/main.jsp">메인으로</a>
-<a href="<%= request.getContextPath() %>/board/board.jsp">게시판으로</a>
+<div class="menu">
+    <a href="<%= request.getContextPath() %>/user/editNickname.jsp">닉네임 변경</a>
+    <a href="<%= request.getContextPath() %>/user/changePassword.jsp">비밀번호 변경</a>
+    <a href="<%= request.getContextPath() %>/main.jsp">메인으로</a>
+    <a href="<%= request.getContextPath() %>/board/board.jsp">게시판으로</a>
+</div>
 
 <hr>
 
 <h2>내가 쓴 글 목록</h2>
 
-<table border="1" width="800">
+<table>
     <tr>
         <th>번호</th>
         <th>제목</th>
@@ -105,16 +139,16 @@
     </tr>
 
 <%
-    String postSql = "SELECT * FROM board WHERE user_id = ? ORDER BY post_id DESC";
+String postSql = "SELECT * FROM board WHERE user_id = ? ORDER BY post_id DESC";
 
-    try (
-        Connection conn = DBUtil.getConnection();
-        PreparedStatement ps = conn.prepareStatement(postSql)
-    ) {
-        ps.setInt(1, userId);
-        ResultSet rs = ps.executeQuery();
+try (
+    Connection conn = DBUtil.getConnection();
+    PreparedStatement ps = conn.prepareStatement(postSql)
+) {
+    ps.setInt(1, userId);
+    ResultSet rs = ps.executeQuery();
 
-        while (rs.next()) {
+    while (rs.next()) {
 %>
     <tr>
         <td><%= rs.getInt("post_id") %></td>
@@ -127,15 +161,15 @@
         <td><%= rs.getInt("view_count") %></td>
     </tr>
 <%
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
+    }
+} catch (Exception e) {
+    e.printStackTrace();
 %>
     <tr>
         <td colspan="4">내가 쓴 글을 불러오지 못했습니다.</td>
     </tr>
 <%
-    }
+}
 %>
 
 </table>

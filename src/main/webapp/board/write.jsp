@@ -1,13 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <%
-    Integer userId = (Integer) session.getAttribute("user_id");
-    String nickname = (String) session.getAttribute("nickname");
+Integer userId = (Integer) session.getAttribute("user_id");
+String nickname = (String) session.getAttribute("nickname");
 
-    if (userId == null) {
-        response.sendRedirect(request.getContextPath() + "/user/login.jsp");
-        return;
-    }
+if (userId == null) {
+    response.sendRedirect(request.getContextPath() + "/user/login.jsp");
+    return;
+}
 %>
 
 <!DOCTYPE html>
@@ -17,25 +17,28 @@
 <title>글쓰기</title>
 
 <style>
-body{
+body {
     font-family: Arial;
-    width:800px;
-    margin:auto;
+    width: 800px;
+    margin: auto;
+    padding-top: 60px;
 }
 
-input,select,textarea{
-    width:100%;
-    margin-bottom:15px;
-    padding:10px;
+input, select, textarea {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
 }
 
-button{
-    padding:10px 20px;
+button {
+    padding: 10px 20px;
 }
 </style>
 
 </head>
 <body>
+
+<jsp:include page="/common/header.jsp"/>
 
 <h1>글쓰기</h1>
 
@@ -57,25 +60,19 @@ button{
 
     <p>
         제목
-        <input type="text"
-               name="title"
-               placeholder="제목 입력"
-               required>
+        <input type="text" name="title" placeholder="제목 입력" required>
     </p>
 
     <p>
         내용
-        <textarea name="content"
-                  rows="10"
-                  placeholder="내용 입력"
-                  required></textarea>
+        <textarea name="content" rows="10" placeholder="내용 입력" required></textarea>
     </p>
 
     <button type="submit">등록</button>
 
     <button type="button"
-    onclick="location.href='<%= request.getContextPath()%>/board/board.jsp'">
-    취소
+            onclick="location.href='<%= request.getContextPath() %>/board/board.jsp'">
+        취소
     </button>
 
 </form>
