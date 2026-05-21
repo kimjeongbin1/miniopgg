@@ -171,9 +171,9 @@ if (!keyword.trim().equals("")) {
     if (searchType.equals("writer")) {
         sql += "WHERE b.writer LIKE ? ";
     } else if (searchType.equals("content")) {
-        sql += "WHERE b.content LIKE ? ";
+        sql += "WHERE (b.title LIKE ? OR b.content LIKE ?) ";
     } else {
-        sql += "WHERE (b.content LIKE ? OR b.writer LIKE ?) ";
+        sql += "WHERE (b.title LIKE ? OR b.content LIKE ? OR b.writer LIKE ?) ";
     }
 }
 
@@ -198,6 +198,10 @@ try (
         String searchKeyword = "%" + keyword + "%";
 
         if (searchType.equals("all")) {
+            ps.setString(1, searchKeyword);
+            ps.setString(2, searchKeyword);
+            ps.setString(3, searchKeyword);
+        } else if (searchType.equals("content")) {
             ps.setString(1, searchKeyword);
             ps.setString(2, searchKeyword);
         } else {
