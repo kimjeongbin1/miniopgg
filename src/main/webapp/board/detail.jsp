@@ -263,6 +263,25 @@ value="<%=postId%>">
 }
 %>
 
+<% if (!isOwner) { %>
+    <form action="<%= request.getContextPath() %>/report" method="post" style="display:inline;">
+        <input type="hidden" name="post_id" value="<%= postId %>">
+        <input type="hidden" name="reported_user_id" value="<%= writerUserId %>">
+
+        <select name="reason" required>
+            <option value="">신고 사유 선택</option>
+            <option value="욕설/비방">욕설/비방</option>
+            <option value="도배">도배</option>
+            <option value="부적절한 내용">부적절한 내용</option>
+            <option value="기타">기타</option>
+        </select>
+
+        <button type="submit" onclick="return confirm('이 게시글을 신고하시겠습니까?');">
+            신고
+        </button>
+    </form>
+<% } %>
+
 <hr>
 
 <h2>댓글</h2>
