@@ -19,6 +19,11 @@ String keyword = request.getParameter("keyword");
 if (keyword == null) {
     keyword = "";
 }
+
+String searchType = request.getParameter("searchType");
+if (searchType == null) {
+    searchType = "all";
+}
 %>
 
 <!DOCTYPE html>
@@ -57,6 +62,21 @@ body {
 .active {
     background: #4f8cff;
     color: white !important;
+}
+
+.search-box {
+    margin-bottom: 15px;
+}
+
+.search-box select,
+.search-box input,
+.search-box button {
+    padding: 8px;
+    font-size: 14px;
+}
+
+.search-box input {
+    width: 250px;
 }
 
 table {
@@ -102,13 +122,24 @@ th, td {
     <a href="<%= request.getContextPath() %>/board/write.jsp">✏ 글쓰기</a>
 </div>
 
-<form method="get" action="<%= request.getContextPath() %>/board/board.jsp">
+<form class="search-box" method="get" action="<%= request.getContextPath() %>/board/board.jsp">
     <input type="hidden" name="sort" value="<%= sort %>">
+
+    <select name="searchType">
+        <option value="all" <%= searchType.equals("all") ? "selected" : "" %>>
+            게시글내용+작성자
+        </option>
+        <option value="writer" <%= searchType.equals("writer") ? "selected" : "" %>>
+            작성자
+        </option>
+        <option value="content" <%= searchType.equals("content") ? "selected" : "" %>>
+            게시글 내용
+        </option>
+    </select>
+
     <input type="text" name="keyword" value="<%= keyword %>" placeholder="검색">
     <button type="submit">검색</button>
 </form>
-
-<br>
 
 <table>
 <tr>
@@ -137,7 +168,13 @@ String sql =
     "LEFT JOIN likes l ON b.post_id = l.post_id ";
 
 if (!keyword.trim().equals("")) {
-    sql += "WHERE b.title LIKE ? ";
+    if (searchType.equals("writer")) {
+        sql += "WHERE b.writer LIKE ? ";
+    } else if (searchType.equals("content")) {
+        sql += "WHERE b.content LIKE ? ";
+    } else {
+        sql += "WHERE (b.content LIKE ? OR b.writer LIKE ?) ";
+    }
 }
 
 sql +=
@@ -158,7 +195,14 @@ try (
     PreparedStatement ps = conn.prepareStatement(sql)
 ) {
     if (!keyword.trim().equals("")) {
-        ps.setString(1, "%" + keyword + "%");
+        String searchKeyword = "%" + keyword + "%";
+
+        if (searchType.equals("all")) {
+            ps.setString(1, searchKeyword);
+            ps.setString(2, searchKeyword);
+        } else {
+            ps.setString(1, searchKeyword);
+        }
     }
 
     ResultSet rs = ps.executeQuery();
