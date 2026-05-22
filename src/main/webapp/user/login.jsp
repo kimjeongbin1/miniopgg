@@ -18,6 +18,7 @@
 
 <br>
 <a href="${pageContext.request.contextPath}/user/signup.jsp">회원가입</a>
-
+<a href="<%= request.getContextPath() %>/user/findId.jsp">아이디 찾기</a>
+<a href="<%= request.getContextPath() %>/user/findPassword.jsp">비밀번호 찾기</a>
 </body>
 </html>
