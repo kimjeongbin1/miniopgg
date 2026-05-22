@@ -42,7 +42,9 @@ button {
 
 <h1>글쓰기</h1>
 
-<form action="<%= request.getContextPath() %>/write" method="post">
+<form action="<%= request.getContextPath() %>/write" 
+      method="post"
+      enctype="multipart/form-data">
 
     <p>
         작성자 :
@@ -66,6 +68,11 @@ button {
     <p>
         내용
         <textarea name="content" rows="10" placeholder="내용 입력" required></textarea>
+    </p>
+
+    <p>
+        사진 첨부
+        <input type="file" name="image" accept="image/*">
     </p>
 
     <button type="submit">등록</button>
