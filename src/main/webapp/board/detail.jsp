@@ -10,13 +10,13 @@ if (loginUserId == null) {
     return;
 }
 
-int postId =
-Integer.parseInt(
-request.getParameter("post_id"));
+int postId = Integer.parseInt(request.getParameter("post_id"));
 
 String title = "";
 String content = "";
 String writer = "";
+String imagePath = null;
+
 Timestamp createdAt = null;
 
 int viewCount = 0;
@@ -26,80 +26,66 @@ int likeCount = 0;
 boolean likedByMe = false;
 
 try (
-Connection conn =
-DBUtil.getConnection()
+    Connection conn = DBUtil.getConnection()
 ) {
+    PreparedStatement updatePs =
+        conn.prepareStatement(
+            "UPDATE board SET view_count = view_count + 1 WHERE post_id = ?"
+        );
 
-PreparedStatement updatePs =
-conn.prepareStatement(
-"UPDATE board SET view_count=view_count+1 WHERE post_id=?");
+    updatePs.setInt(1, postId);
+    updatePs.executeUpdate();
 
-updatePs.setInt(1, postId);
-updatePs.executeUpdate();
+    PreparedStatement selectPs =
+        conn.prepareStatement(
+            "SELECT * FROM board WHERE post_id = ?"
+        );
 
-PreparedStatement selectPs =
-conn.prepareStatement(
-"SELECT * FROM board WHERE post_id=?");
+    selectPs.setInt(1, postId);
 
-selectPs.setInt(1, postId);
+    ResultSet rs = selectPs.executeQuery();
 
-ResultSet rs =
-selectPs.executeQuery();
+    if (rs.next()) {
+        title = rs.getString("title");
+        content = rs.getString("content");
+        writer = rs.getString("writer");
+        imagePath = rs.getString("image_path");
 
-if (rs.next()) {
+        createdAt = rs.getTimestamp("created_at");
+        viewCount = rs.getInt("view_count");
+        writerUserId = rs.getInt("user_id");
+    } else {
+        out.println("게시글 없음");
+        return;
+    }
 
-title = rs.getString("title");
-content = rs.getString("content");
-writer = rs.getString("writer");
+    PreparedStatement likePs =
+        conn.prepareStatement(
+            "SELECT COUNT(*) FROM likes WHERE post_id = ?"
+        );
 
-createdAt =
-rs.getTimestamp("created_at");
+    likePs.setInt(1, postId);
 
-viewCount =
-rs.getInt("view_count");
+    ResultSet likeRs = likePs.executeQuery();
 
-writerUserId =
-rs.getInt("user_id");
+    if (likeRs.next()) {
+        likeCount = likeRs.getInt(1);
+    }
 
-} else {
+    PreparedStatement myLikePs =
+        conn.prepareStatement(
+            "SELECT * FROM likes WHERE post_id = ? AND user_id = ?"
+        );
 
-out.println("게시글 없음");
-return;
+    myLikePs.setInt(1, postId);
+    myLikePs.setInt(2, loginUserId);
 
-}
+    ResultSet myLikeRs = myLikePs.executeQuery();
 
-PreparedStatement likePs =
-conn.prepareStatement(
-"SELECT COUNT(*) FROM likes WHERE post_id=?");
-
-likePs.setInt(1, postId);
-
-ResultSet likeRs =
-likePs.executeQuery();
-
-if (likeRs.next()) {
-
-likeCount =
-likeRs.getInt(1);
-
-}
-
-PreparedStatement myLikePs =
-conn.prepareStatement(
-"SELECT * FROM likes WHERE post_id=? AND user_id=?");
-
-myLikePs.setInt(1, postId);
-myLikePs.setInt(2, loginUserId);
-
-ResultSet myLikeRs =
-myLikePs.executeQuery();
-
-likedByMe = myLikeRs.next();
+    likedByMe = myLikeRs.next();
 
 } catch (Exception e) {
-
-e.printStackTrace();
-
+    e.printStackTrace();
 }
 %>
 
@@ -110,7 +96,6 @@ e.printStackTrace();
 <title>게시글 상세</title>
 
 <style>
-
 body {
     width: 900px;
     margin: auto;
@@ -123,6 +108,13 @@ body {
     padding: 20px;
     margin: 20px 0;
     min-height: 200px;
+}
+
+.post-image {
+    margin-top: 20px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
 }
 
 .like-area {
@@ -169,7 +161,6 @@ body {
 .report-form button {
     padding: 5px 10px;
 }
-
 </style>
 
 </head>
@@ -180,34 +171,32 @@ body {
 <h1><%= title %></h1>
 
 <p>작성자 : <%= writer %></p>
-
 <p>작성일 : <%= createdAt %></p>
-
 <p>조회수 : <%= viewCount %></p>
 
 <hr>
 
 <div class="content-box">
 
-<%= content.replace("\n", "<br>") %>
+    <%= content.replace("\n", "<br>") %>
+
+    <% if (imagePath != null && !imagePath.isEmpty()) { %>
+        <div>
+            <img class="post-image"
+                 src="<%= request.getContextPath() + "/" + imagePath %>">
+        </div>
+    <% } %>
 
 </div>
 
 <div class="like-area">
 
-<form action="<%= request.getContextPath() %>/like"
-method="post">
+<form action="<%= request.getContextPath() %>/like" method="post">
 
-<input type="hidden"
-name="post_id"
-value="<%= postId %>">
+<input type="hidden" name="post_id" value="<%= postId %>">
 
-<button
-class="like-btn <%= likedByMe ? "liked" : "" %>"
-type="submit">
-
-좋아요 <%= likeCount %>
-
+<button class="like-btn <%= likedByMe ? "liked" : "" %>" type="submit">
+    좋아요 <%= likeCount %>
 </button>
 
 </form>
@@ -221,8 +210,7 @@ type="submit">
 </a>
 
 <%
-boolean isOwner =
-(loginUserId == writerUserId);
+boolean isOwner = (loginUserId == writerUserId);
 
 if (isOwner) {
 %>
@@ -232,16 +220,12 @@ if (isOwner) {
 </a>
 
 <form action="<%= request.getContextPath() %>/deletePost"
-method="post"
-style="display:inline;">
+      method="post"
+      style="display:inline;">
 
-<input type="hidden"
-name="post_id"
-value="<%= postId %>">
+<input type="hidden" name="post_id" value="<%= postId %>">
 
-<button type="submit">
-삭제
-</button>
+<button type="submit">삭제</button>
 
 </form>
 
@@ -252,16 +236,11 @@ value="<%= postId %>">
 <% if (!isOwner) { %>
 
 <form class="report-form"
-action="<%= request.getContextPath() %>/report"
-method="post">
+      action="<%= request.getContextPath() %>/report"
+      method="post">
 
-<input type="hidden"
-name="post_id"
-value="<%= postId %>">
-
-<input type="hidden"
-name="reported_user_id"
-value="<%= writerUserId %>">
+<input type="hidden" name="post_id" value="<%= postId %>">
+<input type="hidden" name="reported_user_id" value="<%= writerUserId %>">
 
 <select name="reason" required>
     <option value="">신고 사유 선택</option>
@@ -272,7 +251,7 @@ value="<%= writerUserId %>">
 </select>
 
 <button type="submit"
-onclick="return confirm('이 게시글을 신고하시겠습니까?');">
+        onclick="return confirm('이 게시글을 신고하시겠습니까?');">
 신고
 </button>
 
@@ -284,24 +263,15 @@ onclick="return confirm('이 게시글을 신고하시겠습니까?');">
 
 <h2>댓글</h2>
 
-<form action="<%= request.getContextPath() %>/addComment"
-method="post">
+<form action="<%= request.getContextPath() %>/addComment" method="post">
 
-<input type="hidden"
-name="post_id"
-value="<%= postId %>">
+<input type="hidden" name="post_id" value="<%= postId %>">
 
-<textarea
-name="content"
-rows="3"
-cols="70"
-required></textarea>
+<textarea name="content" rows="3" cols="70" required></textarea>
 
 <br>
 
-<button type="submit">
-댓글 등록
-</button>
+<button type="submit">댓글 등록</button>
 
 </form>
 
@@ -309,43 +279,36 @@ required></textarea>
 
 <%
 try (
-Connection conn =
-DBUtil.getConnection();
+    Connection conn = DBUtil.getConnection();
 
-PreparedStatement ps =
-conn.prepareStatement(
-"SELECT * FROM comments WHERE post_id=? ORDER BY comment_id DESC")
+    PreparedStatement ps =
+        conn.prepareStatement(
+            "SELECT * FROM comments WHERE post_id = ? ORDER BY comment_id DESC"
+        )
 ) {
+    ps.setInt(1, postId);
 
-ps.setInt(1, postId);
+    ResultSet rs = ps.executeQuery();
 
-ResultSet rs =
-ps.executeQuery();
-
-while (rs.next()) {
+    while (rs.next()) {
 %>
 
 <div class="comment-box">
 
 <b><%= rs.getString("writer") %></b>
-
 (<%= rs.getTimestamp("created_at") %>)
 
 <p>
-
 <%= rs.getString("content").replace("\n", "<br>") %>
-
 </p>
 
 </div>
 
 <%
-}
+    }
 
 } catch (Exception e) {
-
-e.printStackTrace();
-
+    e.printStackTrace();
 }
 %>
 
