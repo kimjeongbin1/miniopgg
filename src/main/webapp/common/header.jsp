@@ -58,7 +58,7 @@ String nickname = (String) session.getAttribute("nickname");
 }
 </style>
 
-<button class="nickname-btn" onclick="openSidebar()">
+<button class="nickname-btn" onclick="toggleSidebar()">
     <%= nickname %>님
 </button>
 
@@ -68,19 +68,28 @@ String nickname = (String) session.getAttribute("nickname");
     <h3><%= nickname %>님</h3>
 
     <a href="<%= request.getContextPath() %>/user/mypage.jsp">마이페이지</a>
-    <a href="<%= request.getContextPath() %>/user/editNickname.jsp">닉네임 변경</a>
-    <a href="<%= request.getContextPath() %>/user/changePassword.jsp">비밀번호 변경</a>
     <a href="<%= request.getContextPath() %>/board/myPosts.jsp">내가 쓴 글</a>
     <a href="<%= request.getContextPath() %>/board/myComments.jsp">내 댓글</a>
     <a href="<%= request.getContextPath() %>/logout">로그아웃</a>
 </div>
 
 <script>
-function openSidebar() {
-    document.getElementById("mySidebar").classList.add("active");
+
+function toggleSidebar(){
+
+const sidebar =
+document.getElementById("mySidebar");
+
+sidebar.classList.toggle("active");
+
 }
 
-function closeSidebar() {
-    document.getElementById("mySidebar").classList.remove("active");
+function closeSidebar(){
+
+document
+.getElementById("mySidebar")
+.classList.remove("active");
+
 }
+
 </script>
