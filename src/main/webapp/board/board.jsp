@@ -4,6 +4,7 @@
 
 <%
 String nickname = (String) session.getAttribute("nickname");
+String role = (String) session.getAttribute("role");
 
 if (nickname == null) {
     response.sendRedirect(request.getContextPath() + "/user/login.jsp");
