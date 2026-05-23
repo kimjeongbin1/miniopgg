@@ -31,6 +31,16 @@ public class AddCommentServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/user/login.jsp");
             return;
         }
+        
+        Integer isBlocked = (Integer) session.getAttribute("is_blocked");
+
+        if (isBlocked != null && isBlocked == 1) {
+            response.getWriter().println("<script>");
+            response.getWriter().println("alert('차단된 사용자는 댓글을 작성할 수 없습니다.');");
+            response.getWriter().println("history.back();");
+            response.getWriter().println("</script>");
+            return;
+        }
 
         int postId = Integer.parseInt(request.getParameter("post_id"));
         String content = request.getParameter("content");
