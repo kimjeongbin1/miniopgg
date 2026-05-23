@@ -2,6 +2,7 @@
 
 <%
 String nickname = (String) session.getAttribute("nickname");
+String role = (String) session.getAttribute("role");
 %>
 
 <style>
@@ -70,7 +71,13 @@ String nickname = (String) session.getAttribute("nickname");
     <a href="<%= request.getContextPath() %>/user/mypage.jsp">마이페이지</a>
     <a href="<%= request.getContextPath() %>/board/myPosts.jsp">내가 쓴 글</a>
     <a href="<%= request.getContextPath() %>/board/myComments.jsp">내 댓글</a>
-    <a href="<%= request.getContextPath() %>/logout">로그아웃</a>
+		<% if ("ADMIN".equals(role)) { %>
+	    
+	    <a href="<%= request.getContextPath() %>/admin/adminPage.jsp">
+    			관리자용
+			</a>
+		<% } %>		
+		<a href="<%= request.getContextPath() %>/logout">로그아웃</a>
 </div>
 
 <script>
