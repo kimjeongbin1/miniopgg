@@ -25,6 +25,7 @@ public class DeleteCommentServlet extends HttpServlet {
         HttpSession session = request.getSession();
 
         Integer userId = (Integer) session.getAttribute("user_id");
+        String role = (String) session.getAttribute("role");
 
         if (userId == null) {
             response.sendRedirect(request.getContextPath() + "/user/login.jsp");
@@ -34,18 +35,33 @@ public class DeleteCommentServlet extends HttpServlet {
         int commentId = Integer.parseInt(request.getParameter("comment_id"));
         int postId = Integer.parseInt(request.getParameter("post_id"));
 
-        String sql = "DELETE FROM comments WHERE comment_id = ? AND user_id = ?";
+        boolean isAdmin = "ADMIN".equals(role);
+
+        String sql;
+
+        if (isAdmin) {
+            sql = "DELETE FROM comments WHERE comment_id = ?";
+        } else {
+            sql = "DELETE FROM comments WHERE comment_id = ? AND user_id = ?";
+        }
 
         try (
             Connection conn = DBUtil.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)
         ) {
             ps.setInt(1, commentId);
-            ps.setInt(2, userId);
+
+            if (!isAdmin) {
+                ps.setInt(2, userId);
+            }
 
             ps.executeUpdate();
 
-            response.sendRedirect(request.getContextPath() + "/board/detail.jsp?post_id=" + postId);
+            if (isAdmin) {
+                response.sendRedirect(request.getContextPath() + "/admin/adminPage.jsp");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/board/detail.jsp?post_id=" + postId);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

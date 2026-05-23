@@ -23,7 +23,9 @@ public class DeletePostServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession();
+
         Integer loginUserId = (Integer) session.getAttribute("user_id");
+        String role = (String) session.getAttribute("role");
 
         if (loginUserId == null) {
             response.sendRedirect(request.getContextPath() + "/user/login.jsp");
@@ -32,18 +34,33 @@ public class DeletePostServlet extends HttpServlet {
 
         int postId = Integer.parseInt(request.getParameter("post_id"));
 
-        String sql = "DELETE FROM board WHERE post_id = ? AND user_id = ?";
+        boolean isAdmin = "ADMIN".equals(role);
+
+        String sql;
+
+        if (isAdmin) {
+            sql = "DELETE FROM board WHERE post_id = ?";
+        } else {
+            sql = "DELETE FROM board WHERE post_id = ? AND user_id = ?";
+        }
 
         try (
             Connection conn = DBUtil.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)
         ) {
             ps.setInt(1, postId);
-            ps.setInt(2, loginUserId);
+
+            if (!isAdmin) {
+                ps.setInt(2, loginUserId);
+            }
 
             ps.executeUpdate();
 
-            response.sendRedirect(request.getContextPath() + "/board/board.jsp");
+            if (isAdmin) {
+                response.sendRedirect(request.getContextPath() + "/admin/adminPage.jsp");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/board/board.jsp");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
