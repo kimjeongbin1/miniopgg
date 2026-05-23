@@ -71,6 +71,7 @@ String role = (String) session.getAttribute("role");
     <a href="<%= request.getContextPath() %>/user/mypage.jsp">마이페이지</a>
     <a href="<%= request.getContextPath() %>/board/myPosts.jsp">내가 쓴 글</a>
     <a href="<%= request.getContextPath() %>/board/myComments.jsp">내 댓글</a>
+    <a href="<%= request.getContextPath() %>/board/myFavorites.jsp">즐겨찾기</a>
 		<% if ("ADMIN".equals(role)) { %>
 	    
 	    <a href="<%= request.getContextPath() %>/admin/adminPage.jsp">
