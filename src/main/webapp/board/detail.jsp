@@ -24,6 +24,7 @@ int writerUserId = 0;
 
 int likeCount = 0;
 boolean likedByMe = false;
+boolean favoritedByMe = false;
 
 try (
     Connection conn = DBUtil.getConnection()
@@ -83,6 +84,18 @@ try (
     ResultSet myLikeRs = myLikePs.executeQuery();
 
     likedByMe = myLikeRs.next();
+    
+    PreparedStatement myFavoritePs =
+    		conn.prepareStatement(
+    		"SELECT * FROM favorites WHERE post_id=? AND user_id=?");
+
+    		myFavoritePs.setInt(1, postId);
+    		myFavoritePs.setInt(2, loginUserId);
+
+    		ResultSet myFavoriteRs =
+    		myFavoritePs.executeQuery();
+
+    		favoritedByMe = myFavoriteRs.next();
 
 } catch (Exception e) {
     e.printStackTrace();
@@ -191,18 +204,42 @@ body {
 
 <div class="like-area">
 
-<form action="<%= request.getContextPath() %>/like" method="post">
+<form action="<%= request.getContextPath() %>/like"
+      method="post"
+      style="display:inline;">
 
-<input type="hidden" name="post_id" value="<%= postId %>">
+    <input type="hidden"
+           name="post_id"
+           value="<%= postId %>">
 
-<button class="like-btn <%= likedByMe ? "liked" : "" %>" type="submit">
-    좋아요 <%= likeCount %>
-</button>
+    <button class="like-btn <%= likedByMe ? "liked" : "" %>"
+            type="submit">
+
+        👍 좋아요 <%= likeCount %>
+
+    </button>
+
+</form>
+
+
+<form action="<%= request.getContextPath() %>/favorite"
+      method="post"
+      style="display:inline; margin-left:10px;">
+
+    <input type="hidden"
+           name="post_id"
+           value="<%= postId %>">
+
+    <button class="like-btn <%= favoritedByMe ? "liked" : "" %>"
+            type="submit">
+
+        ⭐ 즐겨찾기
+
+    </button>
 
 </form>
 
 </div>
-
 <hr>
 
 <a href="<%= request.getContextPath() %>/board/board.jsp">
