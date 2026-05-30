@@ -112,6 +112,7 @@
     <div class="nav">
         <span><%= nickname %>님</span>
         <a href="${pageContext.request.contextPath}/board/board.jsp">게시판</a>
+        <a href="${pageContext.request.contextPath}/champion/championList.jsp">챔피언 분석</a>
         <a href="${pageContext.request.contextPath}/user/mypage.jsp">마이페이지</a>
         <a href="${pageContext.request.contextPath}/logout">로그아웃</a>
     </div>
