@@ -51,17 +51,22 @@ fetch(url)
     })
     .then(function(data) {
         var championList = document.getElementById("championList");
-        var champions = data.data;
+        var champions = Object.values(data.data);
 
-        for (var key in champions) {
-            var champion = champions[key];
+     // 챔피언 이름 기준 가나다순 정렬
+     champions.sort(function(a, b) {
+         return a.name.localeCompare(b.name, "ko");
+     });
 
-            championList.innerHTML +=
-                '<div class="champion-card" onclick="moveDetail(\'' + champion.id + '\')">' +
-                    '<img src="https://ddragon.leagueoflegends.com/cdn/' + version + '/img/champion/' + champion.id + '.png">' +
-                    '<div class="champion-name">' + champion.name + '</div>' +
-                '</div>';
-        }
+     for (var i = 0; i < champions.length; i++) {
+         var champion = champions[i];
+
+         championList.innerHTML +=
+             '<div class="champion-card" onclick="moveDetail(\'' + champion.id + '\')">' +
+                 '<img src="https://ddragon.leagueoflegends.com/cdn/' + version + '/img/champion/' + champion.id + '.png">' +
+                 '<div class="champion-name">' + champion.name + '</div>' +
+             '</div>';
+     }
     })
     .catch(function(error) {
         console.log("챔피언 정보 불러오기 실패:", error);
