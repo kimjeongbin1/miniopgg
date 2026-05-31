@@ -1,4 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.List" %>
+<%@ page import="dto.MatchDTO" %>
 
 <%
     String nickname = (String) session.getAttribute("nickname");
@@ -15,6 +17,10 @@
     String puuid = (String) request.getAttribute("puuid");
     String profileIconId = (String) request.getAttribute("profileIconId");
     String summonerLevel = (String) request.getAttribute("summonerLevel");
+    String soloRank = (String) request.getAttribute("soloRank");
+    String flexRank = (String) request.getAttribute("flexRank");
+
+    List<MatchDTO> matchList = (List<MatchDTO>) request.getAttribute("matchList");
 %>
 
 <!DOCTYPE html>
@@ -66,7 +72,7 @@
         padding: 35px;
         margin-top: 30px;
         display: inline-block;
-        min-width: 420px;
+        min-width: 500px;
     }
 
     .profile-icon {
@@ -85,7 +91,26 @@
 
     .level {
         font-size: 20px;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
+    }
+
+    .rank-box {
+        background-color: #111827;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 15px;
+        text-align: left;
+    }
+
+    .rank-title {
+        color: #42d8b1;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .rank-info {
+        font-size: 16px;
+        color: #e5e7eb;
     }
 
     .puuid {
@@ -93,6 +118,58 @@
         color: #9ca3af;
         word-break: break-all;
         margin-top: 20px;
+    }
+
+    .match-section {
+        margin-top: 40px;
+        text-align: left;
+    }
+
+    .match-section h2 {
+        color: #42d8b1;
+        text-align: center;
+    }
+
+    .match-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #202632;
+        border-radius: 12px;
+        padding: 18px 25px;
+        margin-bottom: 15px;
+        border-left: 8px solid #4f8cff;
+    }
+
+    .match-card.lose {
+        border-left-color: #ef4444;
+    }
+
+    .match-result {
+        font-weight: bold;
+        font-size: 18px;
+        width: 80px;
+    }
+
+    .win-text {
+        color: #60a5fa;
+    }
+
+    .lose-text {
+        color: #f87171;
+    }
+
+    .champion-name {
+        font-size: 20px;
+        font-weight: bold;
+        width: 180px;
+    }
+
+    .kda {
+        font-size: 20px;
+        font-weight: bold;
+        width: 150px;
+        text-align: right;
     }
 
     .error-box {
@@ -143,9 +220,47 @@
                 소환사 레벨: <%= summonerLevel %>
             </div>
 
+            <div class="rank-box">
+                <div class="rank-title">솔로랭크</div>
+                <div class="rank-info"><%= soloRank %></div>
+            </div>
+
+            <div class="rank-box">
+                <div class="rank-title">자유랭크</div>
+                <div class="rank-info"><%= flexRank %></div>
+            </div>
+
             <div class="puuid">
                 PUUID: <%= puuid %>
             </div>
+        </div>
+
+        <div class="match-section">
+            <h2>최근 경기</h2>
+
+            <% if (matchList == null || matchList.size() == 0) { %>
+                <p style="text-align:center;">최근 경기 정보가 없습니다.</p>
+            <% } else { %>
+
+                <% for (MatchDTO match : matchList) { %>
+                    <div class="match-card <%= match.isWin() ? "" : "lose" %>">
+                        <div class="match-result <%= match.isWin() ? "win-text" : "lose-text" %>">
+                            <%= match.isWin() ? "승리" : "패배" %>
+                        </div>
+
+                        <div class="champion-name">
+                            <%= match.getChampionName() %>
+                        </div>
+
+                        <div class="kda">
+                            <%= match.getKills() %> /
+                            <%= match.getDeaths() %> /
+                            <%= match.getAssists() %>
+                        </div>
+                    </div>
+                <% } %>
+
+            <% } %>
         </div>
 
     <% } %>
