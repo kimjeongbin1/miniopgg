@@ -113,10 +113,10 @@
 
 <div class="main">
     <h1>소환사 전적 검색</h1>
-    <p>Mini OP.GG에 오신 것을 환영합니다.</p>
+    <p>Riot ID를 입력하세요. 예: Hide on bush#KR1</p>
 
     <form class="search-box" action="${pageContext.request.contextPath}/record" method="get">
-        <input type="text" name="riotId" placeholder="소환사명을 입력하세요 예: Hide on bush#KR1">
+        <input type="text" name="riotId" placeholder="소환사명을 입력하세요 예: Hide on bush#KR1" required>
         <button type="submit">검색</button>
     </form>
 
