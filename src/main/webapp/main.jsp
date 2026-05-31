@@ -1,4 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.sql.*" %>
+<%@ page import="util.DBUtil" %>
 
 <%
     String nickname = (String) session.getAttribute("nickname");
@@ -15,37 +17,12 @@
 <meta charset="UTF-8">
 <title>Mini OP.GG 메인</title>
 
-
 <style>
     body {
         margin: 0;
         font-family: Arial, sans-serif;
         background-color: #111827;
         color: white;
-    }
-
-    .header {
-        background-color: #202632;
-        padding: 20px 60px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .logo {
-        font-size: 28px;
-        font-weight: bold;
-        color: #42d8b1;
-    }
-
-    .nav a {
-        color: white;
-        text-decoration: none;
-        margin-left: 20px;
-    }
-
-    .nav a:hover {
-        color: #42d8b1;
     }
 
     .main {
@@ -76,29 +53,55 @@
         cursor: pointer;
     }
 
-    .cards {
-        display: flex;
-        justify-content: center;
-        gap: 25px;
-        margin-top: 50px;
-    }
-
-    .card {
-        width: 240px;
-        height: 150px;
+    .popular-section {
+        width: 900px;
+        margin: 40px auto;
         background-color: #202632;
         border-radius: 12px;
-        padding: 25px;
+        padding: 30px;
         text-align: left;
     }
 
-    .card h3 {
+    .popular-section h2 {
+        color: #42d8b1;
         margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        color: white;
+    }
+
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid #374151;
+        text-align: center;
+    }
+
+    th {
         color: #42d8b1;
     }
 
-    .card a {
+    .title {
+        text-align: left;
+    }
+
+    .title a {
         color: white;
+        text-decoration: none;
+    }
+
+    .title a:hover {
+        color: #42d8b1;
+    }
+
+    .more-link {
+        display: block;
+        margin-top: 20px;
+        text-align: right;
+        color: #42d8b1;
         text-decoration: none;
     }
 </style>
@@ -106,45 +109,89 @@
 
 <body>
 
-<div class="header">
-    <div class="logo">Mini OP.GG</div>
-
-    <div class="nav">
-        <span><%= nickname %>님</span>
-        <a href="${pageContext.request.contextPath}/board/board.jsp">게시판</a>
-        <a href="${pageContext.request.contextPath}/champion/championList.jsp">챔피언 분석</a>
-        <a href="${pageContext.request.contextPath}/user/mypage.jsp">마이페이지</a>
-        <a href="${pageContext.request.contextPath}/logout">로그아웃</a>
-    </div>
-</div>
+<jsp:include page="/common/header.jsp"/>
 
 <div class="main">
     <h1>소환사 전적 검색</h1>
     <p>Mini OP.GG에 오신 것을 환영합니다.</p>
 
-    <div class="search-box">
-        <input type="text" placeholder="소환사명을 입력하세요">
-        <button>검색</button>
-    </div>
+    <form class="search-box" action="${pageContext.request.contextPath}/record" method="get">
+        <input type="text" name="riotId" placeholder="소환사명을 입력하세요 예: Hide on bush#KR1">
+        <button type="submit">검색</button>
+    </form>
 
-    <div class="cards">
-        <div class="card">
-            <h3>게시판</h3>
-            <p>유저들과 자유롭게 이야기를 나눠보세요.</p>
-            <a href="${pageContext.request.contextPath}/board/board.jsp">게시판 이동</a>
-        </div>
+    <div class="popular-section">
+        <h2>인기글</h2>
 
-        <div class="card">
-            <h3>마이페이지</h3>
-            <p>내 정보와 작성한 글을 확인하세요.</p>
-            <a href="${pageContext.request.contextPath}/user/mypage.jsp">마이페이지 이동</a>
-        </div>
+        <table>
+            <tr>
+                <th>번호</th>
+                <th>좋아요</th>
+                <th>카테고리</th>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>조회수</th>
+            </tr>
 
-        <div class="card">
-            <h3>전적 검색</h3>
-            <p>추후 Riot API 기능을 연결할 수 있습니다.</p>
-            <a href="#">준비 중</a>
-        </div>
+            <%
+                String sql =
+                    "SELECT " +
+                    "b.post_id, " +
+                    "b.title, " +
+                    "b.writer, " +
+                    "b.category, " +
+                    "b.view_count, " +
+                    "COUNT(l.like_id) AS like_count " +
+                    "FROM board b " +
+                    "LEFT JOIN likes l ON b.post_id = l.post_id " +
+                    "GROUP BY b.post_id, b.title, b.writer, b.category, b.view_count, b.created_at " +
+                    "ORDER BY like_count DESC, b.view_count DESC, b.created_at DESC " +
+                    "LIMIT 5";
+
+                try (
+                    Connection conn = DBUtil.getConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    ResultSet rs = ps.executeQuery();
+                ) {
+                    while (rs.next()) {
+                        String category = rs.getString("category");
+
+                        if (category == null || category.trim().equals("")) {
+                            category = "자유";
+                        }
+            %>
+
+            <tr>
+                <td><%= rs.getInt("post_id") %></td>
+                <td>좋아요 <%= rs.getInt("like_count") %></td>
+                <td><%= category %></td>
+                <td class="title">
+                    <a href="<%= request.getContextPath() %>/board/detail.jsp?post_id=<%= rs.getInt("post_id") %>">
+                        <%= rs.getString("title") %>
+                    </a>
+                </td>
+                <td><%= rs.getString("writer") %></td>
+                <td><%= rs.getInt("view_count") %></td>
+            </tr>
+
+            <%
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+            %>
+
+            <tr>
+                <td colspan="6">인기글을 불러오지 못했습니다.</td>
+            </tr>
+
+            <%
+                }
+            %>
+        </table>
+
+        <a class="more-link" href="${pageContext.request.contextPath}/board/board.jsp?sort=popular">
+            인기글 더보기 →
+        </a>
     </div>
 </div>
 

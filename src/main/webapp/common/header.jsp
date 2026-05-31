@@ -6,18 +6,45 @@ String role = (String) session.getAttribute("role");
 %>
 
 <style>
+.common-header {
+    background-color: #202632;
+    padding: 20px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.common-logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #42d8b1;
+    text-decoration: none;
+}
+
+.common-nav {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.common-nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.common-nav a:hover {
+    color: #42d8b1;
+}
+
 .nickname-btn {
-    position: fixed;
-    top: 15px;
-    right: 20px;
-    background: #4f8cff;
+    background: #42d8b1;
     color: white;
     border: none;
     padding: 10px 18px;
     border-radius: 22px;
     cursor: pointer;
     font-weight: bold;
-    z-index: 1001;
 }
 
 .sidebar {
@@ -32,6 +59,7 @@ String role = (String) session.getAttribute("role");
     padding: 20px;
     box-sizing: border-box;
     z-index: 1000;
+    color: black;
 }
 
 .sidebar.active {
@@ -48,6 +76,7 @@ String role = (String) session.getAttribute("role");
 
 .sidebar h3 {
     margin-top: 50px;
+    color: black;
 }
 
 .sidebar a {
@@ -57,11 +86,26 @@ String role = (String) session.getAttribute("role");
     text-decoration: none;
     border-bottom: 1px solid #eee;
 }
+
+.sidebar a:hover {
+    color: #42d8b1;
+}
 </style>
 
-<button class="nickname-btn" onclick="toggleSidebar()">
-    <%= nickname %>님
-</button>
+<div class="common-header">
+    <a class="common-logo" href="<%= request.getContextPath() %>/main.jsp">
+        Mini OP.GG
+    </a>
+
+    <div class="common-nav">
+        <a href="<%= request.getContextPath() %>/board/board.jsp">게시판</a>
+        <a href="<%= request.getContextPath() %>/champion/championList.jsp">챔피언 분석</a>
+
+        <button class="nickname-btn" onclick="toggleSidebar()">
+            <%= nickname %>님
+        </button>
+    </div>
+</div>
 
 <div id="mySidebar" class="sidebar">
     <button class="close-btn" onclick="closeSidebar()">X</button>
@@ -72,32 +116,21 @@ String role = (String) session.getAttribute("role");
     <a href="<%= request.getContextPath() %>/board/myPosts.jsp">내가 쓴 글</a>
     <a href="<%= request.getContextPath() %>/board/myComments.jsp">내 댓글</a>
     <a href="<%= request.getContextPath() %>/board/myFavorites.jsp">즐겨찾기</a>
-		<% if ("ADMIN".equals(role)) { %>
-	    
-	    <a href="<%= request.getContextPath() %>/admin/adminPage.jsp">
-    			관리자용
-			</a>
-		<% } %>		
-		<a href="<%= request.getContextPath() %>/logout">로그아웃</a>
+
+    <% if ("ADMIN".equals(role)) { %>
+        <a href="<%= request.getContextPath() %>/admin/adminPage.jsp">관리자용</a>
+    <% } %>
+
+    <a href="<%= request.getContextPath() %>/logout">로그아웃</a>
 </div>
 
 <script>
-
-function toggleSidebar(){
-
-const sidebar =
-document.getElementById("mySidebar");
-
-sidebar.classList.toggle("active");
-
+function toggleSidebar() {
+    const sidebar = document.getElementById("mySidebar");
+    sidebar.classList.toggle("active");
 }
 
-function closeSidebar(){
-
-document
-.getElementById("mySidebar")
-.classList.remove("active");
-
+function closeSidebar() {
+    document.getElementById("mySidebar").classList.remove("active");
 }
-
 </script>
