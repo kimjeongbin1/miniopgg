@@ -1,7 +1,9 @@
 package servlet;
 
 import java.io.IOException;
+import java.util.List;
 
+import dto.MatchDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -50,17 +52,22 @@ public class RecordServlet extends HttpServlet {
 
             String[] summonerInfo = riotApiService.getSummonerInfo(gameName, tagLine);
 
+            String puuid = summonerInfo[2];
+
+            List<MatchDTO> matchList = riotApiService.getRecentMatches(puuid, 3);
+
             request.setAttribute("gameName", summonerInfo[0]);
             request.setAttribute("tagLine", summonerInfo[1]);
             request.setAttribute("puuid", summonerInfo[2]);
             request.setAttribute("profileIconId", summonerInfo[3]);
             request.setAttribute("summonerLevel", summonerInfo[4]);
+            request.setAttribute("soloRank", summonerInfo[5]);
+            request.setAttribute("flexRank", summonerInfo[6]);
+            request.setAttribute("matchList", matchList);
 
         } catch (Exception e) {
             e.printStackTrace();
-
-            request.setAttribute("error",
-                    "오류 내용: " + e.getMessage());
+            request.setAttribute("error", "오류 내용: " + e.getMessage());
         }
 
         request.getRequestDispatcher("/record/recordResult.jsp").forward(request, response);
