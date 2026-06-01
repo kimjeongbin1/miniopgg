@@ -1,6 +1,43 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="dto.MatchDTO" %>
+<%@ page import="java.text.DecimalFormat" %>
+
+<%!
+    public String getSpellImageName(int spellId) {
+        switch (spellId) {
+            case 1: return "SummonerBoost";
+            case 3: return "SummonerExhaust";
+            case 4: return "SummonerFlash";
+            case 6: return "SummonerHaste";
+            case 7: return "SummonerHeal";
+            case 11: return "SummonerSmite";
+            case 12: return "SummonerTeleport";
+            case 13: return "SummonerMana";
+            case 14: return "SummonerDot";
+            case 21: return "SummonerBarrier";
+            case 32: return "SummonerSnowball";
+            default: return "";
+        }
+    }
+
+		public String getRuneImageUrl(int styleId) {
+		    switch (styleId) {
+		        case 8000:
+		            return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/7201_Precision.png";
+		        case 8100:
+		            return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/7200_Domination.png";
+		        case 8200:
+		            return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/7202_Sorcery.png";
+		        case 8300:
+		            return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/7203_Whimsy.png";
+		        case 8400:
+		            return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/7204_Resolve.png";
+		        default:
+		            return "";
+		    }
+		}
+%>
 
 <%
     String nickname = (String) session.getAttribute("nickname");
@@ -21,6 +58,9 @@
     String flexRank = (String) request.getAttribute("flexRank");
 
     List<MatchDTO> matchList = (List<MatchDTO>) request.getAttribute("matchList");
+
+    DecimalFormat df = new DecimalFormat("0.00");
+    String version = "16.11.1";
 %>
 
 <!DOCTYPE html>
@@ -38,7 +78,7 @@
     }
 
     .container {
-        width: 900px;
+        width: 1150px;
         margin: 60px auto;
         text-align: center;
     }
@@ -72,7 +112,7 @@
         padding: 35px;
         margin-top: 30px;
         display: inline-block;
-        min-width: 500px;
+        min-width: 600px;
     }
 
     .profile-icon {
@@ -83,7 +123,7 @@
     }
 
     .riot-id {
-        font-size: 28px;
+        font-size: 30px;
         font-weight: bold;
         color: #42d8b1;
         margin-bottom: 10px;
@@ -121,24 +161,26 @@
     }
 
     .match-section {
-        margin-top: 40px;
+        margin-top: 50px;
         text-align: left;
     }
 
     .match-section h2 {
         color: #42d8b1;
         text-align: center;
+        font-size: 30px;
     }
 
     .match-card {
-        display: flex;
+        display: grid;
+        grid-template-columns: 80px 80px 70px 150px 140px 100px 230px;
         align-items: center;
-        justify-content: space-between;
         background-color: #202632;
         border-radius: 12px;
         padding: 18px 25px;
         margin-bottom: 15px;
         border-left: 8px solid #4f8cff;
+        gap: 15px;
     }
 
     .match-card.lose {
@@ -148,7 +190,6 @@
     .match-result {
         font-weight: bold;
         font-size: 18px;
-        width: 80px;
     }
 
     .win-text {
@@ -159,17 +200,62 @@
         color: #f87171;
     }
 
+    .champion-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+    }
+
+    .spell-rune-box {
+        display: flex;
+        gap: 5px;
+    }
+
+    .spell-box, .rune-box {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .spell-img, .rune-img {
+        width: 28px;
+        height: 28px;
+        border-radius: 5px;
+        background-color: #374151;
+    }
+
     .champion-name {
         font-size: 20px;
         font-weight: bold;
-        width: 180px;
     }
 
     .kda {
         font-size: 20px;
         font-weight: bold;
-        width: 150px;
-        text-align: right;
+    }
+
+    .kda-ratio {
+        color: #42d8b1;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+    .sub-info {
+        color: #cbd5e1;
+        font-size: 14px;
+    }
+
+    .item-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .item-img {
+        width: 30px;
+        height: 30px;
+        border-radius: 5px;
+        background-color: #374151;
     }
 
     .error-box {
@@ -209,7 +295,7 @@
 
         <div class="result-card">
             <img class="profile-icon"
-                 src="https://ddragon.leagueoflegends.com/cdn/15.10.1/img/profileicon/<%= profileIconId %>.png"
+                 src="https://ddragon.leagueoflegends.com/cdn/<%= version %>/img/profileicon/<%= profileIconId %>.png"
                  alt="프로필 아이콘">
 
             <div class="riot-id">
@@ -244,19 +330,93 @@
 
                 <% for (MatchDTO match : matchList) { %>
                     <div class="match-card <%= match.isWin() ? "" : "lose" %>">
+
                         <div class="match-result <%= match.isWin() ? "win-text" : "lose-text" %>">
                             <%= match.isWin() ? "승리" : "패배" %>
                         </div>
 
+                        <div>
+                            <img class="champion-icon"
+                                 src="https://ddragon.leagueoflegends.com/cdn/<%= version %>/img/champion/<%= match.getChampionName() %>.png"
+                                 alt="챔피언">
+                        </div>
+
+                        <div class="spell-rune-box">
+                            <div class="spell-box">
+                                <%
+                                    String spell1 = getSpellImageName(match.getSummoner1Id());
+                                    String spell2 = getSpellImageName(match.getSummoner2Id());
+                                %>
+
+                                <% if (!spell1.equals("")) { %>
+                                    <img class="spell-img"
+                                         src="https://ddragon.leagueoflegends.com/cdn/<%= version %>/img/spell/<%= spell1 %>.png">
+                                <% } %>
+
+                                <% if (!spell2.equals("")) { %>
+                                    <img class="spell-img"
+                                         src="https://ddragon.leagueoflegends.com/cdn/<%= version %>/img/spell/<%= spell2 %>.png">
+                                <% } %>
+                            </div>
+
+                            <div class="rune-box">
+                                <%
+                                    String primaryRune = getRuneImageUrl(match.getPerkPrimaryStyle());
+                                    String subRune = getRuneImageUrl(match.getPerkSubStyle());
+                                %>
+
+                                <% if (!primaryRune.equals("")) { %>
+                                    <img class="rune-img" src="<%= primaryRune %>">
+                                <% } %>
+
+                                <% if (!subRune.equals("")) { %>
+                                    <img class="rune-img" src="<%= subRune %>">
+                                <% } %>
+                            </div>
+                        </div>
+
                         <div class="champion-name">
-                            <%= match.getChampionName() %>
+                            <span class="champion-name-text" data-champion="<%= match.getChampionName() %>">
+                                <%= match.getChampionName() %>
+                            </span>
+                            <div class="sub-info"><%= match.getGameMode() %></div>
                         </div>
 
                         <div class="kda">
                             <%= match.getKills() %> /
                             <%= match.getDeaths() %> /
                             <%= match.getAssists() %>
+                            <div class="kda-ratio">
+                                평점 <%= df.format(match.getKdaRatio()) %>
+                            </div>
                         </div>
+
+                        <div class="sub-info">
+                            CS <%= match.getCs() %>
+                        </div>
+
+                        <div class="item-list">
+                            <% int[] items = {
+                                match.getItem0(),
+                                match.getItem1(),
+                                match.getItem2(),
+                                match.getItem3(),
+                                match.getItem4(),
+                                match.getItem5(),
+                                match.getItem6()
+                            }; %>
+
+                            <% for (int item : items) { %>
+                                <% if (item != 0) { %>
+                                    <img class="item-img"
+                                         src="https://ddragon.leagueoflegends.com/cdn/<%= version %>/img/item/<%= item %>.png"
+                                         alt="item">
+                                <% } else { %>
+                                    <div class="item-img"></div>
+                                <% } %>
+                            <% } %>
+                        </div>
+
                     </div>
                 <% } %>
 
@@ -269,6 +429,33 @@
         <a href="${pageContext.request.contextPath}/main.jsp">메인으로 돌아가기</a>
     </p>
 </div>
+
+<script>
+var version = "<%= version %>";
+var championUrl = "https://ddragon.leagueoflegends.com/cdn/"
+                + version
+                + "/data/ko_KR/champion.json";
+
+fetch(championUrl)
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        var championData = data.data;
+        var championNames = document.querySelectorAll(".champion-name-text");
+
+        championNames.forEach(function(element) {
+            var championId = element.getAttribute("data-champion");
+
+            if (championData[championId]) {
+                element.innerText = championData[championId].name;
+            }
+        });
+    })
+    .catch(function(error) {
+        console.log("챔피언 한글 이름 불러오기 실패:", error);
+    });
+</script>
 
 </body>
 </html>

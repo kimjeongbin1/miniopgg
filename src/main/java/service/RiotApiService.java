@@ -17,7 +17,6 @@ public class RiotApiService {
     private static final String KR_HOST = "kr.api.riotgames.com";
 
     public String[] getSummonerInfo(String gameName, String tagLine) throws Exception {
-
         String accountPath = "/riot/account/v1/accounts/by-riot-id/" + gameName + "/" + tagLine;
         URI accountUri = new URI("https", ASIA_HOST, accountPath, null);
         String accountJson = sendGet(accountUri.toASCIIString());
@@ -25,10 +24,6 @@ public class RiotApiService {
         String puuid = extractValue(accountJson, "puuid");
         String responseGameName = extractValue(accountJson, "gameName");
         String responseTagLine = extractValue(accountJson, "tagLine");
-
-        if (puuid == null || puuid.equals("")) {
-            throw new RuntimeException("PUUID를 가져오지 못했습니다.");
-        }
 
         String summonerPath = "/lol/summoner/v4/summoners/by-puuid/" + puuid;
         URI summonerUri = new URI("https", KR_HOST, summonerPath, null);
@@ -45,13 +40,8 @@ public class RiotApiService {
         String flexRank = extractRankInfo(leagueJson, "RANKED_FLEX_SR");
 
         return new String[] {
-                responseGameName,
-                responseTagLine,
-                puuid,
-                profileIconId,
-                summonerLevel,
-                soloRank,
-                flexRank
+            responseGameName, responseTagLine, puuid,
+            profileIconId, summonerLevel, soloRank, flexRank
         };
     }
 
@@ -62,14 +52,7 @@ public class RiotApiService {
         String matchIdsQuery = "start=0&count=" + count;
 
         URI matchIdsUri = new URI("https", ASIA_HOST, matchIdsPath, matchIdsQuery, null);
-
-        System.out.println("===== MATCH IDS URL =====");
-        System.out.println(matchIdsUri.toASCIIString());
-
         String matchIdsJson = sendGet(matchIdsUri.toASCIIString());
-
-        System.out.println("===== MATCH IDS JSON =====");
-        System.out.println(matchIdsJson);
 
         List<String> matchIds = parseMatchIds(matchIdsJson);
 
@@ -78,14 +61,7 @@ public class RiotApiService {
             URI matchDetailUri = new URI("https", ASIA_HOST, matchDetailPath, null);
 
             String matchJson = sendGet(matchDetailUri.toASCIIString());
-
-            System.out.println("===== MATCH JSON =====");
-            System.out.println(matchJson);
-
             String participantJson = findParticipantObject(matchJson, puuid);
-
-            System.out.println("===== PARTICIPANT JSON =====");
-            System.out.println(participantJson);
 
             if (participantJson == null || participantJson.equals("")) {
                 continue;
@@ -98,6 +74,26 @@ public class RiotApiService {
             match.setDeaths(parseInt(extractNumberValue(participantJson, "deaths")));
             match.setAssists(parseInt(extractNumberValue(participantJson, "assists")));
             match.setWin(parseBoolean(extractBooleanValue(participantJson, "win")));
+
+            match.setTotalMinionsKilled(parseInt(extractNumberValue(participantJson, "totalMinionsKilled")));
+            match.setNeutralMinionsKilled(parseInt(extractNumberValue(participantJson, "neutralMinionsKilled")));
+
+            match.setItem0(parseInt(extractNumberValue(participantJson, "item0")));
+            match.setItem1(parseInt(extractNumberValue(participantJson, "item1")));
+            match.setItem2(parseInt(extractNumberValue(participantJson, "item2")));
+            match.setItem3(parseInt(extractNumberValue(participantJson, "item3")));
+            match.setItem4(parseInt(extractNumberValue(participantJson, "item4")));
+            match.setItem5(parseInt(extractNumberValue(participantJson, "item5")));
+            match.setItem6(parseInt(extractNumberValue(participantJson, "item6")));
+
+            match.setSummoner1Id(parseInt(extractNumberValue(participantJson, "summoner1Id")));
+            match.setSummoner2Id(parseInt(extractNumberValue(participantJson, "summoner2Id")));
+
+            match.setPerkPrimaryStyle(extractRuneStyle(participantJson, 0));
+            match.setPerkSubStyle(extractRuneStyle(participantJson, 1));
+
+            String gameMode = extractValue(matchJson, "gameMode");
+            match.setGameMode(changeGameModeName(gameMode));
 
             matchList.add(match);
         }
@@ -135,12 +131,9 @@ public class RiotApiService {
 
         if (responseCode < 200 || responseCode >= 300) {
             throw new RuntimeException(
-                    "Riot API 오류: "
-                    + responseCode
-                    + " / URL: "
-                    + apiUrl
-                    + " / "
-                    + sb.toString()
+                "Riot API 오류: " + responseCode +
+                " / URL: " + apiUrl +
+                " / " + sb.toString()
             );
         }
 
@@ -176,7 +169,6 @@ public class RiotApiService {
         int start = -1;
         int balance = 0;
 
-        // puuid 위치에서 뒤로 가면서 참가자 객체의 시작 { 찾기
         for (int i = puuidIndex; i >= 0; i--) {
             char c = json.charAt(i);
 
@@ -198,7 +190,6 @@ public class RiotApiService {
 
         int braceCount = 0;
 
-        // 찾은 { 부터 참가자 객체의 끝 } 찾기
         for (int i = start; i < json.length(); i++) {
             char c = json.charAt(i);
 
@@ -216,13 +207,49 @@ public class RiotApiService {
         return "";
     }
 
+    private int extractRuneStyle(String participantJson, int index) {
+        String stylesTarget = "\"styles\":[";
+        int stylesStart = participantJson.indexOf(stylesTarget);
+
+        if (stylesStart == -1) {
+            return 0;
+        }
+
+        int searchStart = stylesStart;
+
+        for (int i = 0; i <= index; i++) {
+            int styleIndex = participantJson.indexOf("\"style\":", searchStart);
+
+            if (styleIndex == -1) {
+                return 0;
+            }
+
+            if (i == index) {
+                String styleValue = extractNumberFromIndex(participantJson, styleIndex + "\"style\":".length());
+                return parseInt(styleValue);
+            }
+
+            searchStart = styleIndex + 1;
+        }
+
+        return 0;
+    }
+
+    private String extractNumberFromIndex(String json, int start) {
+        int end = json.indexOf(",", start);
+
+        if (end == -1) {
+            end = json.indexOf("}", start);
+        }
+
+        return json.substring(start, end).trim();
+    }
+
     private String extractValue(String json, String key) {
         String target = "\"" + key + "\":\"";
         int start = json.indexOf(target);
 
-        if (start == -1) {
-            return "";
-        }
+        if (start == -1) return "";
 
         start += target.length();
         int end = json.indexOf("\"", start);
@@ -234,9 +261,7 @@ public class RiotApiService {
         String target = "\"" + key + "\":";
         int start = json.indexOf(target);
 
-        if (start == -1) {
-            return "";
-        }
+        if (start == -1) return "";
 
         start += target.length();
 
@@ -253,9 +278,7 @@ public class RiotApiService {
         String target = "\"" + key + "\":";
         int start = json.indexOf(target);
 
-        if (start == -1) {
-            return "false";
-        }
+        if (start == -1) return "false";
 
         start += target.length();
 
@@ -295,6 +318,18 @@ public class RiotApiService {
         }
 
         return tier + " " + rank + " / " + leaguePoints + "LP / " + wins + "승 " + losses + "패";
+    }
+
+    private String changeGameModeName(String gameMode) {
+        if ("CLASSIC".equals(gameMode)) {
+            return "소환사의 협곡";
+        } else if ("ARAM".equals(gameMode)) {
+            return "칼바람 나락";
+        } else if ("URF".equals(gameMode)) {
+            return "URF";
+        } else {
+            return gameMode;
+        }
     }
 
     private int parseInt(String value) {
