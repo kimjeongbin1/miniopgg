@@ -21,22 +21,100 @@
         }
     }
 
-		public String getRuneImageUrl(int styleId) {
-		    switch (styleId) {
-		        case 8000:
-		            return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/7201_Precision.png";
-		        case 8100:
-		            return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/7200_Domination.png";
-		        case 8200:
-		            return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/7202_Sorcery.png";
-		        case 8300:
-		            return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/7203_Whimsy.png";
-		        case 8400:
-		            return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/7204_Resolve.png";
-		        default:
-		            return "";
+		public String getTimeAgo(long gameCreation) {
+		    if (gameCreation == 0) return "";
+		
+		    long now = System.currentTimeMillis();
+		    long diff = now - gameCreation;
+		
+		    long minutes = diff / (1000 * 60);
+		
+		    if (minutes < 60) {
+		        return minutes + "분 전";
 		    }
+		
+		    long hours = minutes / 60;
+		
+		    if (hours < 24) {
+		        return hours + "시간 전";
+		    }
+		
+		    long days = hours / 24;
+		
+		    return days + "일 전";
 		}
+		
+		public String getGameDuration(long gameDuration) {
+		    if (gameDuration == 0) return "";
+		
+		    long minutes = gameDuration / 60;
+		    long seconds = gameDuration % 60;
+		
+		    return minutes + "분 " + seconds + "초";
+		}
+
+    public String getRuneImageUrl(int styleId) {
+        switch (styleId) {
+            case 8000:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/7201_Precision.png";
+            case 8100:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/7200_Domination.png";
+            case 8200:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/7202_Sorcery.png";
+            case 8300:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/7203_Whimsy.png";
+            case 8400:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/7204_Resolve.png";
+            default:
+                return "";
+        }
+    }
+
+    public String getMainRuneImageUrl(int perkId) {
+        switch (perkId) {
+            case 8005:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png";
+            case 8008:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Precision/LethalTempo/LethalTempoTemp.png";
+            case 8021:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Precision/FleetFootwork/FleetFootwork.png";
+            case 8010:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Precision/Conqueror/Conqueror.png";
+
+            case 8112:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Domination/Electrocute/Electrocute.png";
+            case 8124:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Domination/Predator/Predator.png";
+            case 8128:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Domination/DarkHarvest/DarkHarvest.png";
+            case 9923:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Domination/HailOfBlades/HailOfBlades.png";
+
+            case 8214:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Sorcery/SummonAery/SummonAery.png";
+            case 8229:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Sorcery/ArcaneComet/ArcaneComet.png";
+            case 8230:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Sorcery/PhaseRush/PhaseRush.png";
+
+            case 8437:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Resolve/GraspOfTheUndying/GraspOfTheUndying.png";
+            case 8439:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Resolve/VeteranAftershock/VeteranAftershock.png";
+            case 8465:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Resolve/Guardian/Guardian.png";
+
+            case 8351:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Inspiration/GlacialAugment/GlacialAugment.png";
+            case 8360:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Inspiration/UnsealedSpellbook/UnsealedSpellbook.png";
+            case 8369:
+                return "https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Inspiration/FirstStrike/FirstStrike.png";
+
+            default:
+                return "";
+        }
+    }
 %>
 
 <%
@@ -217,11 +295,19 @@
         gap: 4px;
     }
 
-    .spell-img, .rune-img {
+    .spell-img {
         width: 28px;
         height: 28px;
         border-radius: 5px;
         background-color: #374151;
+    }
+
+    .rune-img {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: #111827;
+        padding: 2px;
     }
 
     .champion-name {
@@ -257,6 +343,33 @@
         border-radius: 5px;
         background-color: #374151;
     }
+    
+    .match-info-left {
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1.6;
+		}
+		
+		.queue-text {
+		    color: #60a5fa;
+		}
+		
+		.time-ago {
+		    color: #cbd5e1;
+		    font-weight: normal;
+		}
+		
+		.result-line {
+		    width: 55px;
+		    height: 1px;
+		    background-color: #374151;
+		    margin: 8px 0;
+		}
+		
+		.duration-text {
+		    color: #cbd5e1;
+		    font-weight: normal;
+		}
 
     .error-box {
         background-color: #7f1d1d;
@@ -331,9 +444,18 @@
                 <% for (MatchDTO match : matchList) { %>
                     <div class="match-card <%= match.isWin() ? "" : "lose" %>">
 
-                        <div class="match-result <%= match.isWin() ? "win-text" : "lose-text" %>">
-                            <%= match.isWin() ? "승리" : "패배" %>
-                        </div>
+                        <div class="match-info-left">
+										    <div class="queue-text"><%= match.getGameMode() %></div>
+										    <div class="time-ago"><%= getTimeAgo(match.getGameCreation()) %></div>
+										
+										    <div class="result-line"></div>
+										
+										    <div class="<%= match.isWin() ? "win-text" : "lose-text" %>">
+										        <%= match.isWin() ? "승리" : "패배" %>
+										    </div>
+										
+										    <div class="duration-text"><%= getGameDuration(match.getGameDuration()) %></div>
+										</div>
 
                         <div>
                             <img class="champion-icon"
@@ -361,7 +483,7 @@
 
                             <div class="rune-box">
                                 <%
-                                    String primaryRune = getRuneImageUrl(match.getPerkPrimaryStyle());
+                                    String primaryRune = getMainRuneImageUrl(match.getMainPerk());
                                     String subRune = getRuneImageUrl(match.getPerkSubStyle());
                                 %>
 
@@ -379,7 +501,7 @@
                             <span class="champion-name-text" data-champion="<%= match.getChampionName() %>">
                                 <%= match.getChampionName() %>
                             </span>
-                            <div class="sub-info"><%= match.getGameMode() %></div>
+                            
                         </div>
 
                         <div class="kda">
@@ -389,6 +511,9 @@
                             <div class="kda-ratio">
                                 평점 <%= df.format(match.getKdaRatio()) %>
                             </div>
+                            <div class="sub-info">
+														    킬관여 <%= match.getKillParticipation() %>%
+														</div>
                         </div>
 
                         <div class="sub-info">

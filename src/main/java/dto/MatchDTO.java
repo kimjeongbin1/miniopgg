@@ -9,15 +9,38 @@ public class MatchDTO {
 
     private int totalMinionsKilled;
     private int neutralMinionsKilled;
+
+    private int queueId;
     private String gameMode;
 
     private int item0, item1, item2, item3, item4, item5, item6;
-    
+
     private int summoner1Id;
     private int summoner2Id;
 
-    private int perkPrimaryStyle;
+    private int mainPerk;
     private int perkSubStyle;
+    
+    private long gameCreation;
+    private long gameDuration;
+    
+    private int killParticipation;
+
+    public long getGameCreation() {
+        return gameCreation;
+    }
+
+    public void setGameCreation(long gameCreation) {
+        this.gameCreation = gameCreation;
+    }
+
+    public long getGameDuration() {
+        return gameDuration;
+    }
+
+    public void setGameDuration(long gameDuration) {
+        this.gameDuration = gameDuration;
+    }
 
     public String getChampionName() { return championName; }
     public void setChampionName(String championName) { this.championName = championName; }
@@ -35,10 +58,17 @@ public class MatchDTO {
     public void setWin(boolean win) { this.win = win; }
 
     public int getTotalMinionsKilled() { return totalMinionsKilled; }
-    public void setTotalMinionsKilled(int totalMinionsKilled) { this.totalMinionsKilled = totalMinionsKilled; }
+    public void setTotalMinionsKilled(int totalMinionsKilled) {
+        this.totalMinionsKilled = totalMinionsKilled;
+    }
 
     public int getNeutralMinionsKilled() { return neutralMinionsKilled; }
-    public void setNeutralMinionsKilled(int neutralMinionsKilled) { this.neutralMinionsKilled = neutralMinionsKilled; }
+    public void setNeutralMinionsKilled(int neutralMinionsKilled) {
+        this.neutralMinionsKilled = neutralMinionsKilled;
+    }
+
+    public int getQueueId() { return queueId; }
+    public void setQueueId(int queueId) { this.queueId = queueId; }
 
     public String getGameMode() { return gameMode; }
     public void setGameMode(String gameMode) { this.gameMode = gameMode; }
@@ -72,36 +102,32 @@ public class MatchDTO {
 
     public int getItem6() { return item6; }
     public void setItem6(int item6) { this.item6 = item6; }
-    
-    public int getSummoner1Id() {
-        return summoner1Id;
-    }
 
+    public int getSummoner1Id() { return summoner1Id; }
     public void setSummoner1Id(int summoner1Id) {
         this.summoner1Id = summoner1Id;
     }
 
-    public int getSummoner2Id() {
-        return summoner2Id;
-    }
-
+    public int getSummoner2Id() { return summoner2Id; }
     public void setSummoner2Id(int summoner2Id) {
         this.summoner2Id = summoner2Id;
     }
 
-    public int getPerkPrimaryStyle() {
-        return perkPrimaryStyle;
+    public int getMainPerk() { return mainPerk; }
+    public void setMainPerk(int mainPerk) {
+        this.mainPerk = mainPerk;
     }
 
-    public void setPerkPrimaryStyle(int perkPrimaryStyle) {
-        this.perkPrimaryStyle = perkPrimaryStyle;
-    }
-
-    public int getPerkSubStyle() {
-        return perkSubStyle;
-    }
-
+    public int getPerkSubStyle() { return perkSubStyle; }
     public void setPerkSubStyle(int perkSubStyle) {
         this.perkSubStyle = perkSubStyle;
+    }
+    
+    public int getKillParticipation() {
+        return killParticipation;
+    }
+
+    public void setKillParticipation(int killParticipation) {
+        this.killParticipation = killParticipation;
     }
 }

@@ -7,12 +7,14 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import dto.MatchDTO;
 
 public class RiotApiService {
 
-    private static final String API_KEY = "RGAPI-ec76a796-beae-4519-a053-0d06832f9866";
+    private static final String API_KEY = "RGAPI-ac473a64-bc8c-4be7-9504-33ae4f7c45f3";
     private static final String ASIA_HOST = "asia.api.riotgames.com";
     private static final String KR_HOST = "kr.api.riotgames.com";
 
@@ -75,6 +77,27 @@ public class RiotApiService {
             match.setAssists(parseInt(extractNumberValue(participantJson, "assists")));
             match.setWin(parseBoolean(extractBooleanValue(participantJson, "win")));
 
+            
+            System.out.println(
+            	    "participants 개수 = "
+            	    + extractParticipantObjects(matchJson).size()
+            	);            
+            
+            int teamKills = getTeamKills(matchJson, participantJson);
+            
+            System.out.println(
+            	    match.getChampionName()
+            	    + " 팀킬 = "
+            	    + teamKills
+            	);
+            int killParticipation = 0;
+
+            if (teamKills > 0) {
+                killParticipation = (match.getKills() + match.getAssists()) * 100 / teamKills;
+            }
+
+            match.setKillParticipation(killParticipation);
+
             match.setTotalMinionsKilled(parseInt(extractNumberValue(participantJson, "totalMinionsKilled")));
             match.setNeutralMinionsKilled(parseInt(extractNumberValue(participantJson, "neutralMinionsKilled")));
 
@@ -89,11 +112,15 @@ public class RiotApiService {
             match.setSummoner1Id(parseInt(extractNumberValue(participantJson, "summoner1Id")));
             match.setSummoner2Id(parseInt(extractNumberValue(participantJson, "summoner2Id")));
 
-            match.setPerkPrimaryStyle(extractRuneStyle(participantJson, 0));
-            match.setPerkSubStyle(extractRuneStyle(participantJson, 1));
+            match.setMainPerk(extractMainPerk(participantJson));
+            match.setPerkSubStyle(extractSubRuneStyle(participantJson));
 
-            String gameMode = extractValue(matchJson, "gameMode");
-            match.setGameMode(changeGameModeName(gameMode));
+            int queueId = parseInt(extractNumberValue(matchJson, "queueId"));
+            match.setQueueId(queueId);
+            match.setGameMode(getQueueType(queueId));
+
+            match.setGameCreation(parseLong(extractNumberValue(matchJson, "gameCreation")));
+            match.setGameDuration(parseLong(extractNumberValue(matchJson, "gameDuration")));
 
             matchList.add(match);
         }
@@ -207,42 +234,135 @@ public class RiotApiService {
         return "";
     }
 
-    private int extractRuneStyle(String participantJson, int index) {
-        String stylesTarget = "\"styles\":[";
-        int stylesStart = participantJson.indexOf(stylesTarget);
+    private List<String> extractParticipantObjects(String matchJson) {
+        List<String> participants = new ArrayList<>();
 
-        if (stylesStart == -1) {
+        int participantsIndex = matchJson.indexOf("\"participants\"");
+        if (participantsIndex == -1) {
+            return participants;
+        }
+
+        int arrayStart = matchJson.indexOf("[", participantsIndex);
+        if (arrayStart == -1) {
+            return participants;
+        }
+
+        int bracketCount = 0;
+        int arrayEnd = -1;
+
+        for (int i = arrayStart; i < matchJson.length(); i++) {
+            char c = matchJson.charAt(i);
+
+            if (c == '[') {
+                bracketCount++;
+            } else if (c == ']') {
+                bracketCount--;
+
+                if (bracketCount == 0) {
+                    arrayEnd = i;
+                    break;
+                }
+            }
+        }
+
+        if (arrayEnd == -1) {
+            return participants;
+        }
+
+        String participantsArray = matchJson.substring(arrayStart + 1, arrayEnd);
+
+        int index = 0;
+
+        while (index < participantsArray.length()) {
+            int objectStart = participantsArray.indexOf("{", index);
+
+            if (objectStart == -1) {
+                break;
+            }
+
+            int braceCount = 0;
+            int objectEnd = -1;
+
+            for (int i = objectStart; i < participantsArray.length(); i++) {
+                char c = participantsArray.charAt(i);
+
+                if (c == '{') {
+                    braceCount++;
+                } else if (c == '}') {
+                    braceCount--;
+
+                    if (braceCount == 0) {
+                        objectEnd = i;
+                        break;
+                    }
+                }
+            }
+
+            if (objectEnd == -1) {
+                break;
+            }
+
+            participants.add(participantsArray.substring(objectStart, objectEnd + 1));
+            index = objectEnd + 1;
+
+            if (participants.size() >= 10) {
+                break;
+            }
+        }
+
+        return participants;
+    }
+
+    private int getTeamKills(String matchJson, String participantJson) {
+        int myTeamId = parseInt(extractNumberValue(participantJson, "teamId"));
+
+        if (myTeamId == 0) {
             return 0;
         }
 
-        int searchStart = stylesStart;
+        Pattern pattern = Pattern.compile(
+            "\"kills\"\\s*:\\s*(\\d+).*?\"teamId\"\\s*:\\s*" + myTeamId,
+            Pattern.DOTALL
+        );
 
-        for (int i = 0; i <= index; i++) {
-            int styleIndex = participantJson.indexOf("\"style\":", searchStart);
+        Matcher matcher = pattern.matcher(matchJson);
 
-            if (styleIndex == -1) {
-                return 0;
-            }
+        int teamKills = 0;
 
-            if (i == index) {
-                String styleValue = extractNumberFromIndex(participantJson, styleIndex + "\"style\":".length());
-                return parseInt(styleValue);
-            }
+        while (matcher.find()) {
+            teamKills += parseInt(matcher.group(1));
+        }
 
-            searchStart = styleIndex + 1;
+        return teamKills;
+    }
+    private int extractMainPerk(String participantJson) {
+        Pattern pattern = Pattern.compile(
+            "\"description\"\\s*:\\s*\"primaryStyle\".*?\"selections\"\\s*:\\s*\\[\\s*\\{\\s*\"perk\"\\s*:\\s*(\\d+)",
+            Pattern.DOTALL
+        );
+
+        Matcher matcher = pattern.matcher(participantJson);
+
+        if (matcher.find()) {
+            return parseInt(matcher.group(1));
         }
 
         return 0;
     }
 
-    private String extractNumberFromIndex(String json, int start) {
-        int end = json.indexOf(",", start);
+    private int extractSubRuneStyle(String participantJson) {
+        Pattern pattern = Pattern.compile(
+            "\"description\"\\s*:\\s*\"subStyle\".*?\"style\"\\s*:\\s*(\\d+)",
+            Pattern.DOTALL
+        );
 
-        if (end == -1) {
-            end = json.indexOf("}", start);
+        Matcher matcher = pattern.matcher(participantJson);
+
+        if (matcher.find()) {
+            return parseInt(matcher.group(1));
         }
 
-        return json.substring(start, end).trim();
+        return 0;
     }
 
     private String extractValue(String json, String key) {
@@ -320,21 +440,36 @@ public class RiotApiService {
         return tier + " " + rank + " / " + leaguePoints + "LP / " + wins + "승 " + losses + "패";
     }
 
-    private String changeGameModeName(String gameMode) {
-        if ("CLASSIC".equals(gameMode)) {
-            return "소환사의 협곡";
-        } else if ("ARAM".equals(gameMode)) {
-            return "칼바람 나락";
-        } else if ("URF".equals(gameMode)) {
-            return "URF";
-        } else {
-            return gameMode;
+    private String getQueueType(int queueId) {
+        switch (queueId) {
+            case 420:
+                return "솔로랭크";
+            case 440:
+                return "자유랭크";
+            case 450:
+                return "칼바람";
+            case 430:
+                return "일반게임";
+            case 400:
+                return "일반교차";
+            case 900:
+                return "URF";
+            default:
+                return "기타";
         }
     }
 
     private int parseInt(String value) {
         try {
             return Integer.parseInt(value);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    private long parseLong(String value) {
+        try {
+            return Long.parseLong(value);
         } catch (Exception e) {
             return 0;
         }
