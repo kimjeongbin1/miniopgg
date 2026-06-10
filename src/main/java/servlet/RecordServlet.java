@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 import dto.MatchDTO;
+import dto.ChampionStatsDTO;
+import dto.ChampionMasteryDTO;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -54,7 +57,14 @@ public class RecordServlet extends HttpServlet {
 
             String puuid = summonerInfo[2];
 
-            List<MatchDTO> matchList = riotApiService.getRecentMatches(puuid, 3);
+            List<MatchDTO> matchList =
+                    riotApiService.getRecentMatches(puuid, 3);
+
+            List<ChampionStatsDTO> championStatsList =
+                    riotApiService.getChampionStats(puuid);
+
+            List<ChampionMasteryDTO> championMasteryList =
+                    riotApiService.getChampionMasteries(puuid);
 
             request.setAttribute("gameName", summonerInfo[0]);
             request.setAttribute("tagLine", summonerInfo[1]);
@@ -63,7 +73,10 @@ public class RecordServlet extends HttpServlet {
             request.setAttribute("summonerLevel", summonerInfo[4]);
             request.setAttribute("soloRank", summonerInfo[5]);
             request.setAttribute("flexRank", summonerInfo[6]);
+
             request.setAttribute("matchList", matchList);
+            request.setAttribute("championStatsList", championStatsList);
+            request.setAttribute("championMasteryList", championMasteryList);
 
         } catch (Exception e) {
             e.printStackTrace();

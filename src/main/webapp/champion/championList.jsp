@@ -5,31 +5,74 @@
 <head>
 <meta charset="UTF-8">
 <title>챔피언 목록</title>
+
 <style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #111827;
+    color: white;
+}
+
+.page-container {
+    width: 1300px;
+    margin: 40px auto;
+}
+
+.page-title {
+    text-align: center;
+    color: #42d8b1;
+    font-size: 42px;
+    margin-bottom: 35px;
+}
+
+.search-box {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.search-box input {
+    width: 400px;
+    height: 50px;
+    border: none;
+    border-radius: 10px;
+    background: #202632;
+    color: white;
+    padding: 0 15px;
+    font-size: 16px;
+}
+
 #championList {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 20px;
 }
 
 .champion-card {
-    width: 120px;
+    background-color: #202632;
+    border-radius: 14px;
+    padding: 15px;
     text-align: center;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 10px;
     cursor: pointer;
+    transition: 0.2s;
+}
+
+.champion-card:hover {
+    transform: translateY(-5px);
+    background-color: #2a3445;
 }
 
 .champion-card img {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
+    border-radius: 12px;
 }
 
 .champion-name {
-    margin-top: 8px;
+    margin-top: 12px;
+    font-size: 15px;
     font-weight: bold;
+    color: white;
 }
 </style>
 </head>
@@ -37,9 +80,21 @@
 
 <jsp:include page="/common/header.jsp" />
 
-<h2 style="text-align:center;">챔피언 목록</h2>
+<div class="page-container">
 
-<div id="championList"></div>
+    <h1 class="page-title">챔피언 목록</h1>
+
+    <div class="search-box">
+        <input
+            type="text"
+            id="championSearch"
+            placeholder="챔피언 검색..."
+            onkeyup="searchChampion()">
+    </div>
+
+    <div id="championList"></div>
+
+</div>
 
 <script>
 var version = "16.11.1";
@@ -76,6 +131,31 @@ fetch(url)
 
 function moveDetail(championId) {
     location.href = "championDetail.jsp?champion=" + championId;
+}
+function searchChampion() {
+
+    var keyword =
+        document.getElementById("championSearch")
+        .value
+        .toLowerCase();
+
+    var cards =
+        document.getElementsByClassName("champion-card");
+
+    for (var i = 0; i < cards.length; i++) {
+
+        var name =
+            cards[i]
+            .querySelector(".champion-name")
+            .innerText
+            .toLowerCase();
+
+        if (name.includes(keyword)) {
+            cards[i].style.display = "";
+        } else {
+            cards[i].style.display = "none";
+        }
+    }
 }
 </script>
 

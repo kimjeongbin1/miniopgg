@@ -1,5 +1,7 @@
 package dto;
 
+import java.util.List;
+
 public class MatchDTO {
     private String championName;
     private int kills;
@@ -25,6 +27,9 @@ public class MatchDTO {
     private long gameDuration;
     
     private int killParticipation;
+
+    private List<ParticipantDTO> blueTeam;
+    private List<ParticipantDTO> redTeam;
 
     public long getGameCreation() {
         return gameCreation;
@@ -129,5 +134,21 @@ public class MatchDTO {
 
     public void setKillParticipation(int killParticipation) {
         this.killParticipation = killParticipation;
+    }
+
+    public List<ParticipantDTO> getBlueTeam() {
+        return blueTeam;
+    }
+
+    public void setBlueTeam(List<ParticipantDTO> blueTeam) {
+        this.blueTeam = blueTeam;
+    }
+
+    public List<ParticipantDTO> getRedTeam() {
+        return redTeam;
+    }
+
+    public void setRedTeam(List<ParticipantDTO> redTeam) {
+        this.redTeam = redTeam;
     }
 }

@@ -1,0 +1,28 @@
+:root {
+    --bg: #111827;
+    --card: #202632;
+    --input: #111827;
+    --text: #ffffff;
+    --subtext: #cbd5e1;
+    --line: #374151;
+    --hover: rgba(66, 216, 177, 0.08);
+    --menu: #2b3444;
+    --accent: #42d8b1;
+}
+
+body.light-theme {
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --input: #ffffff;
+    --text: #111827;
+    --subtext: #374151;
+    --line: #cbd5e1;
+    --hover: rgba(66, 216, 177, 0.12);
+    --menu: #eef2f7;
+    --accent: #42d8b1;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+}

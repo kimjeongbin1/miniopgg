@@ -18,92 +18,128 @@
 <title>Mini OP.GG 메인</title>
 
 <style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background-color: #111827;
-        color: white;
-    }
+:root {
+    --bg: #111827;
+    --card: #202632;
+    --input: #111827;
+    --text: white;
+    --subtext: #cbd5e1;
+    --line: #374151;
+    --hover: rgba(66, 216, 177, 0.08);
+}
 
-    .main {
-        padding: 60px;
-        text-align: center;
-    }
+body.light-theme {
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --input: #ffffff;
+    --text: #111827;
+    --subtext: #374151;
+    --line: #cbd5e1;
+    --hover: rgba(66, 216, 177, 0.12);
+}
 
-    .search-box {
-        margin: 40px auto;
-        width: 600px;
-        display: flex;
-    }
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+}
 
-    .search-box input {
-        flex: 1;
-        height: 55px;
-        font-size: 18px;
-        padding: 0 15px;
-        border: none;
-    }
+.main {
+    padding: 60px;
+    text-align: center;
+}
 
-    .search-box button {
-        width: 110px;
-        border: none;
-        background-color: #42d8b1;
-        color: white;
-        font-size: 18px;
-        cursor: pointer;
-    }
+.search-box {
+    margin: 40px auto;
+    width: 600px;
+    display: flex;
+}
 
-    .popular-section {
-        width: 900px;
-        margin: 40px auto;
-        background-color: #202632;
-        border-radius: 12px;
-        padding: 30px;
-        text-align: left;
-    }
+.search-box input {
+    flex: 1;
+    height: 55px;
+    font-size: 18px;
+    padding: 0 15px;
+    border: 1px solid var(--line);
+    background-color: var(--input);
+    color: var(--text);
+}
 
-    .popular-section h2 {
-        color: #42d8b1;
-        margin-top: 0;
-        margin-bottom: 20px;
-    }
+.search-box input::placeholder {
+    color: var(--subtext);
+}
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        color: white;
-    }
+.search-box button {
+    width: 110px;
+    border: none;
+    background-color: #42d8b1;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
 
-    th, td {
-        padding: 12px;
-        border-bottom: 1px solid #374151;
-        text-align: center;
-    }
+.popular-section {
+    width: 900px;
+    margin: 40px auto;
+    background-color: var(--card);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: left;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
 
-    th {
-        color: #42d8b1;
-    }
+.popular-section h2 {
+    color: #42d8b1;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
 
-    .title {
-        text-align: left;
-    }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text);
+}
 
-    .title a {
-        color: white;
-        text-decoration: none;
-    }
+th, td {
+    padding: 12px;
+    border-bottom: 1px solid var(--line);
+    text-align: center;
+    color: var(--text);
+}
 
-    .title a:hover {
-        color: #42d8b1;
-    }
+th {
+    color: #42d8b1;
+}
 
-    .more-link {
-        display: block;
-        margin-top: 20px;
-        text-align: right;
-        color: #42d8b1;
-        text-decoration: none;
-    }
+tr {
+    transition: background-color 0.2s;
+}
+
+tr:hover td {
+    background-color: var(--hover) !important;
+}
+
+.title {
+    text-align: left;
+}
+
+.title a {
+    color: var(--text);
+    text-decoration: none;
+}
+
+.title a:hover {
+    color: #42d8b1;
+}
+
+.more-link {
+    display: block;
+    margin-top: 20px;
+    text-align: right;
+    color: #42d8b1;
+    text-decoration: none;
+}
 </style>
 </head>
 

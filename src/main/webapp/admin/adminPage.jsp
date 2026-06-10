@@ -20,6 +20,7 @@
 <meta charset="UTF-8">
 <title>관리자 페이지</title>
 
+
 <style>
     body {
         width: 1100px;

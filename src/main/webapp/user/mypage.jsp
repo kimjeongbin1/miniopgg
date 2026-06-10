@@ -29,30 +29,160 @@ String userSql = "SELECT * FROM users WHERE user_id = ?";
 
 <style>
 body {
-    width: 900px;
-    margin: auto;
-    font-family: Arial;
-    padding-top: 60px;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
 }
 
-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-bottom: 25px;
+.page-container {
+    width: 1100px;
+    margin: 45px auto;
 }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
+.page-title {
+    color: var(--accent);
+    font-size: 34px;
+    margin-bottom: 28px;
 }
 
-th {
-    width: 150px;
-    background: #f5f5f5;
+.profile-card,
+.section-card {
+    background-color: var(--card);
+    border-radius: 18px;
+    padding: 32px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.profile-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background-color: var(--accent);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #111827;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.profile-name {
+    font-size: 26px;
+    font-weight: bold;
+    color: var(--text);
+}
+
+.profile-sub {
+    color: var(--subtext);
+    margin-top: 6px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.info-box {
+    background-color: var(--input);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px;
+}
+
+.info-label {
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.info-value {
+    color: var(--text);
+    font-size: 17px;
+}
+
+.menu {
+    display: flex;
+    gap: 10px;
+    margin-top: 28px;
+    flex-wrap: wrap;
 }
 
 .menu a {
-    margin-right: 10px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    background-color: var(--menu);
+    color: var(--text);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.menu a:hover {
+    background-color: var(--hover);
+    color: var(--accent);
+}
+
+.menu a.primary {
+    background-color: var(--accent);
+    color: white;
+}
+
+.section-title {
+    color: var(--accent);
+    font-size: 26px;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.post-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.post-table th {
+    color: var(--accent);
+    padding: 14px 10px;
+    border-bottom: 1px solid var(--line);
+}
+
+.post-table td {
+    padding: 15px 10px;
+    border-bottom: 1px solid var(--line);
+    text-align: center;
+    color: var(--text);
+}
+
+.post-table tr:hover td {
+    background-color: var(--hover) !important;
+}
+
+.post-title {
+    text-align: left !important;
+}
+
+.post-title a {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.post-title a:hover {
+    color: var(--accent);
+}
+
+.empty-row {
+    color: var(--subtext);
+    padding: 28px;
 }
 </style>
 </head>
@@ -61,7 +191,7 @@ th {
 
 <jsp:include page="/common/header.jsp"/>
 
-<h1>마이페이지</h1>
+<div class="page-container">
 
 <%
 try (
@@ -82,61 +212,79 @@ try (
     }
 } catch (Exception e) {
     e.printStackTrace();
-    out.println("회원정보를 불러오지 못했습니다.");
+    out.println("<div class='profile-card'>회원정보를 불러오지 못했습니다.</div>");
 }
 %>
 
-<h2>내 회원정보</h2>
+    <h1 class="page-title">마이페이지</h1>
 
-<table>
-    <tr>
-        <th>아이디</th>
-        <td><%= loginId %></td>
-    </tr>
-    <tr>
-        <th>닉네임</th>
-        <td><%= nickname %></td>
-    </tr>
-    <tr>
-        <th>이메일</th>
-        <td><%= email == null ? "" : email %></td>
-    </tr>
-    <tr>
-        <th>이름</th>
-        <td><%= name == null ? "" : name %></td>
-    </tr>
-    <tr>
-        <th>생년월일</th>
-        <td><%= birthdate == null ? "" : birthdate %></td>
-    </tr>
-    <tr>
-        <th>성별</th>
-        <td><%= gender == null ? "" : gender %></td>
-    </tr>
-    <tr>
-        <th>전화번호</th>
-        <td><%= phone == null ? "" : phone %></td>
-    </tr>
-</table>
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <%= nickname != null && nickname.length() > 0 ? nickname.substring(0, 1) : "U" %>
+            </div>
 
-<div class="menu">
-    <a href="<%= request.getContextPath() %>/user/editNickname.jsp">닉네임 변경</a>
-    <a href="<%= request.getContextPath() %>/user/changePassword.jsp">비밀번호 변경</a>
-    <a href="<%= request.getContextPath() %>/main.jsp">메인으로</a>
-    <a href="<%= request.getContextPath() %>/board/board.jsp">게시판으로</a>
-</div>
+            <div>
+                <div class="profile-name"><%= nickname %></div>
+                <div class="profile-sub"><%= loginId %>님의 회원정보</div>
+            </div>
+        </div>
 
-<hr>
+        <div class="info-grid">
+            <div class="info-box">
+                <div class="info-label">아이디</div>
+                <div class="info-value"><%= loginId %></div>
+            </div>
 
-<h2>내가 쓴 글 목록</h2>
+            <div class="info-box">
+                <div class="info-label">닉네임</div>
+                <div class="info-value"><%= nickname %></div>
+            </div>
 
-<table>
-    <tr>
-        <th>번호</th>
-        <th>제목</th>
-        <th>작성일</th>
-        <th>조회수</th>
-    </tr>
+            <div class="info-box">
+                <div class="info-label">이메일</div>
+                <div class="info-value"><%= email == null ? "" : email %></div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-label">이름</div>
+                <div class="info-value"><%= name == null ? "" : name %></div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-label">생년월일</div>
+                <div class="info-value"><%= birthdate == null ? "" : birthdate %></div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-label">성별</div>
+                <div class="info-value"><%= gender == null ? "" : gender %></div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-label">전화번호</div>
+                <div class="info-value"><%= phone == null ? "" : phone %></div>
+            </div>
+        </div>
+
+        <div class="menu">
+            <a class="primary" href="<%= request.getContextPath() %>/user/editNickname.jsp">닉네임 변경</a>
+            <a href="<%= request.getContextPath() %>/user/changePassword.jsp">비밀번호 변경</a>
+            <a href="<%= request.getContextPath() %>/main.jsp">메인으로</a>
+            <a href="<%= request.getContextPath() %>/board/board.jsp">게시판으로</a>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h2 class="section-title">내가 쓴 글 목록</h2>
+
+        <table class="post-table">
+            <tr>
+                <th>번호</th>
+                <th>제목</th>
+                <th>작성일</th>
+                <th>조회수</th>
+            </tr>
 
 <%
 String postSql = "SELECT * FROM board WHERE user_id = ? ORDER BY post_id DESC";
@@ -148,31 +296,46 @@ try (
     ps.setInt(1, userId);
     ResultSet rs = ps.executeQuery();
 
+    boolean hasPost = false;
+
     while (rs.next()) {
+        hasPost = true;
 %>
-    <tr>
-        <td><%= rs.getInt("post_id") %></td>
-        <td>
-            <a href="<%= request.getContextPath() %>/board/detail.jsp?post_id=<%= rs.getInt("post_id") %>">
-                <%= rs.getString("title") %>
-            </a>
-        </td>
-        <td><%= rs.getTimestamp("created_at") %></td>
-        <td><%= rs.getInt("view_count") %></td>
-    </tr>
+            <tr>
+                <td><%= rs.getInt("post_id") %></td>
+                <td class="post-title">
+                    <a href="<%= request.getContextPath() %>/board/detail.jsp?post_id=<%= rs.getInt("post_id") %>">
+                        <%= rs.getString("title") %>
+                    </a>
+                </td>
+                <td><%= rs.getTimestamp("created_at") %></td>
+                <td><%= rs.getInt("view_count") %></td>
+            </tr>
 <%
     }
+
+    if (!hasPost) {
+%>
+            <tr>
+                <td class="empty-row" colspan="4">작성한 글이 없습니다.</td>
+            </tr>
+<%
+    }
+
 } catch (Exception e) {
     e.printStackTrace();
 %>
-    <tr>
-        <td colspan="4">내가 쓴 글을 불러오지 못했습니다.</td>
-    </tr>
+            <tr>
+                <td class="empty-row" colspan="4">내가 쓴 글을 불러오지 못했습니다.</td>
+            </tr>
 <%
 }
 %>
 
-</table>
+        </table>
+    </div>
+
+</div>
 
 </body>
 </html>

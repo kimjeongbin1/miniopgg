@@ -30,103 +30,185 @@ if (category == null) category = "";
 <meta charset="UTF-8">
 <title>게시판</title>
 
+
 <style>
+:root {
+    --bg: #111827;
+    --card: #202632;
+    --input: #111827;
+    --text: white;
+    --subtext: #cbd5e1;
+    --line: #374151;
+    --hover: rgba(66, 216, 177, 0.08);
+    --menu: #2b3444;
+}
+
+body.light-theme {
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --input: #ffffff;
+    --text: #111827;
+    --subtext: #374151;
+    --line: #cbd5e1;
+    --hover: rgba(66, 216, 177, 0.12);
+    --menu: #eef2f7;
+}
+
 body {
     margin: 0;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
 }
 
 .board-layout {
     display: flex;
     gap: 30px;
-    width: 1200px;
-    margin: 30px auto 0 auto;
+    width: 1250px;
+    margin: 45px auto 0 auto;
 }
 
 .category-sidebar {
-    width: 200px;
-    background: #1f2430;
-    padding: 20px;
-    border-radius: 8px;
+    width: 220px;
+    background-color: var(--card);
+    padding: 24px;
+    border-radius: 16px;
     height: fit-content;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
 }
 
 .category-sidebar h3 {
-    color: white;
+    color: var(--text);
+    font-size: 24px;
     margin-top: 0;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 }
 
 .category-sidebar a {
     display: block;
-    color: #ddd;
+    color: var(--subtext);
     text-decoration: none;
-    padding: 12px;
-    border-radius: 6px;
-    margin-bottom: 6px;
-}
-
-.category-sidebar a:hover {
-    background: #2d3440;
-}
-
-.category-sidebar a.active {
-    background: #2d3440;
-    color: #4fffd1 !important;
+    padding: 14px 16px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    font-size: 16px;
     font-weight: bold;
+}
+
+.category-sidebar a:hover,
+.category-sidebar a.active {
+    background-color: var(--menu);
+    color: #42d8b1 !important;
 }
 
 .board-content {
     flex: 1;
+    background-color: var(--card);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
 }
 
 .top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 26px;
+}
+
+.top h1 {
+    margin: 0;
+    font-size: 34px;
+    color: #42d8b1;
 }
 
 .tab {
-    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
 }
 
 .tab a {
-    padding: 10px 15px;
+    padding: 11px 18px;
     text-decoration: none;
-    border: 1px solid #ddd;
-    color: black;
-    margin-right: 5px;
-    border-radius: 8px;
+    background-color: var(--menu);
+    color: var(--text);
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.tab a:hover {
+    background-color: var(--hover);
+    color: #42d8b1;
 }
 
 .tab a.active {
-    background: #4f8cff;
+    background-color: #4f8cff;
     color: white !important;
 }
 
+.tab a.write-btn {
+    margin-left: auto;
+    background-color: #42d8b1;
+    color: white;
+}
+
 .search-box {
-    margin-bottom: 15px;
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
 }
 
 .search-box select,
 .search-box input,
 .search-box button {
-    padding: 8px;
-    font-size: 14px;
+    height: 42px;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+.search-box select {
+    width: 130px;
+    padding: 0 10px;
+    background-color: var(--input);
+    color: var(--text);
+    border: 1px solid var(--line);
 }
 
 .search-box input {
-    width: 250px;
+    width: 310px;
+    padding: 0 14px;
+    background-color: var(--input);
+    color: var(--text);
+    border: 1px solid var(--line);
+}
+
+.search-box input::placeholder {
+    color: var(--subtext);
+}
+
+.search-box button {
+    width: 75px;
+    border: none;
+    background-color: #42d8b1;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .category-filter {
-    margin-bottom: 15px;
+    margin: 12px 0 18px 0;
+    color: var(--subtext);
     font-size: 14px;
 }
 
+.category-filter b {
+    color: #42d8b1;
+}
+
 .category-link {
-    color: #4f8cff;
+    color: #60a5fa;
     text-decoration: none;
     font-weight: bold;
 }
@@ -137,23 +219,57 @@ body {
 
 .clear-category {
     margin-left: 10px;
-    color: red;
+    color: #f87171;
     text-decoration: none;
+    font-weight: bold;
 }
 
-table {
+.board-table {
     width: 100%;
     border-collapse: collapse;
+    overflow: hidden;
 }
 
-th, td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
+.board-table th {
+    padding: 14px 10px;
+    color: var(--text);
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+}
+
+.board-table td {
+    padding: 15px 10px;
+    border-bottom: 1px solid var(--line);
     text-align: center;
+    color: var(--text);
+}
+
+.board-table tr:hover td {
+    background-color: var(--hover) !important;
 }
 
 .title {
-    text-align: left;
+    text-align: left !important;
+}
+
+.title a {
+    color: var(--text);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.title a:hover {
+    color: #42d8b1;
+}
+
+.like-text {
+    color: #f87171;
+    font-weight: bold;
+}
+
+.empty-row {
+    color: var(--subtext);
+    padding: 30px;
 }
 </style>
 </head>
@@ -204,7 +320,7 @@ th, td {
             <a class="<%= sort.equals("views") ? "active" : "" %>"
                href="<%= request.getContextPath() %>/board/board.jsp?sort=views&searchType=<%= searchType %>&keyword=<%= keyword %>&category=<%= category %>">조회수</a>
 
-            <a href="<%= request.getContextPath() %>/board/write.jsp">글쓰기</a>
+            <a class="write-btn" href="<%= request.getContextPath() %>/board/write.jsp">글쓰기</a>
         </div>
 
         <form class="search-box" method="get" action="<%= request.getContextPath() %>/board/board.jsp">
@@ -218,7 +334,7 @@ th, td {
                 <option value="writer" <%= searchType.equals("writer") ? "selected" : "" %>>작성자</option>
             </select>
 
-            <input type="text" name="keyword" value="<%= keyword %>" placeholder="검색">
+            <input type="text" name="keyword" value="<%= keyword %>" placeholder="검색어를 입력하세요">
             <button type="submit">검색</button>
         </form>
 
@@ -231,7 +347,7 @@ th, td {
         </div>
         <% } %>
 
-        <table>
+        <table class="board-table">
             <tr>
                 <th>번호</th>
                 <th>좋아요</th>
@@ -323,7 +439,11 @@ try (
 
     ResultSet rs = ps.executeQuery();
 
+    boolean hasPost = false;
+
     while (rs.next()) {
+        hasPost = true;
+
         String postCategory = rs.getString("category");
         if (postCategory == null || postCategory.trim().equals("")) {
             postCategory = "자유";
@@ -333,7 +453,7 @@ try (
             <tr>
                 <td><%= rs.getInt("post_id") %></td>
 
-                <td>좋아요 <%= rs.getInt("like_count") %></td>
+                <td class="like-text">♥ <%= rs.getInt("like_count") %></td>
 
                 <td>
                     <a class="category-link"
@@ -357,11 +477,20 @@ try (
 
 <%
     }
+
+    if (!hasPost) {
+%>
+            <tr>
+                <td class="empty-row" colspan="7">게시글이 없습니다.</td>
+            </tr>
+<%
+    }
+
 } catch (Exception e) {
     e.printStackTrace();
 %>
             <tr>
-                <td colspan="7">게시글을 불러오지 못했습니다.</td>
+                <td class="empty-row" colspan="7">게시글을 불러오지 못했습니다.</td>
             </tr>
 <%
 }

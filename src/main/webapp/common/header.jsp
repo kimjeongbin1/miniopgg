@@ -4,10 +4,11 @@
 String nickname = (String) session.getAttribute("nickname");
 String role = (String) session.getAttribute("role");
 %>
-
+<link rel="stylesheet"
+      href="<%= request.getContextPath() %>/css/theme.css">
 <style>
 .common-header {
-    background-color: #202632;
+    background-color: var(--card, #202632);
     padding: 20px 60px;
     display: flex;
     justify-content: space-between;
@@ -28,13 +29,24 @@ String role = (String) session.getAttribute("role");
 }
 
 .common-nav a {
-    color: white;
+    color: var(--text, white);
     text-decoration: none;
     font-size: 16px;
 }
 
 .common-nav a:hover {
     color: #42d8b1;
+}
+
+.theme-btn {
+    background: var(--input, #111827);
+    color: var(--text, white);
+    border: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
 }
 
 .nickname-btn {
@@ -53,13 +65,13 @@ String role = (String) session.getAttribute("role");
     right: -320px;
     width: 280px;
     height: 100%;
-    background: white;
+    background: var(--card, white);
     box-shadow: -3px 0 10px rgba(0,0,0,0.2);
     transition: right 0.3s;
     padding: 20px;
     box-sizing: border-box;
     z-index: 1000;
-    color: black;
+    color: var(--text, black);
 }
 
 .sidebar.active {
@@ -72,19 +84,20 @@ String role = (String) session.getAttribute("role");
     background: none;
     font-size: 24px;
     cursor: pointer;
+    color: var(--text, black);
 }
 
 .sidebar h3 {
     margin-top: 50px;
-    color: black;
+    color: var(--text, black);
 }
 
 .sidebar a {
     display: block;
     padding: 12px 0;
-    color: black;
+    color: var(--text, black);
     text-decoration: none;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--line, #eee);
 }
 
 .sidebar a:hover {
@@ -100,6 +113,8 @@ String role = (String) session.getAttribute("role");
     <div class="common-nav">
         <a href="<%= request.getContextPath() %>/board/board.jsp">게시판</a>
         <a href="<%= request.getContextPath() %>/champion/championList.jsp">챔피언 분석</a>
+
+        <button id="themeToggle" class="theme-btn" type="button" onclick="toggleTheme()">🌙</button>
 
         <button class="nickname-btn" onclick="toggleSidebar()">
             <%= nickname %>님
@@ -125,6 +140,46 @@ String role = (String) session.getAttribute("role");
 </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    applySavedTheme();
+});
+
+function applySavedTheme() {
+    var savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "light") {
+        document.body.classList.add("light-theme");
+    } else {
+        document.body.classList.remove("light-theme");
+    }
+
+    updateThemeButton();
+}
+
+function toggleTheme() {
+    document.body.classList.toggle("light-theme");
+
+    if (document.body.classList.contains("light-theme")) {
+        localStorage.setItem("theme", "light");
+    } else {
+        localStorage.setItem("theme", "dark");
+    }
+
+    updateThemeButton();
+}
+
+function updateThemeButton() {
+    var btn = document.getElementById("themeToggle");
+
+    if (!btn) return;
+
+    if (document.body.classList.contains("light-theme")) {
+        btn.innerText = "☀️";
+    } else {
+        btn.innerText = "🌙";
+    }
+}
+
 function toggleSidebar() {
     const sidebar = document.getElementById("mySidebar");
     sidebar.classList.toggle("active");

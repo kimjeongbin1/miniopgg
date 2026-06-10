@@ -54,20 +54,105 @@ if (loginUserId != writerUserId) {
 
 <style>
 body {
-    width: 800px;
-    margin: auto;
-    font-family: Arial;
-    padding-top: 60px;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
 }
 
-input, textarea {
+.edit-container {
+    width: 900px;
+    margin: 45px auto;
+}
+
+.edit-card {
+    background-color: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 36px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.edit-title {
+    color: var(--accent);
+    font-size: 34px;
+    margin: 0 0 28px 0;
+}
+
+.input-group {
+    margin-bottom: 22px;
+}
+
+.input-group label {
+    display: block;
+    color: var(--subtext);
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.input-group input,
+.input-group textarea {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background-color: var(--input);
+    color: var(--text);
+    padding: 14px;
+    font-size: 16px;
+    box-sizing: border-box;
+    outline: none;
 }
 
-button {
-    padding: 10px 20px;
+.input-group textarea {
+    min-height: 260px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+    border: 2px solid var(--accent);
+}
+
+.button-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 28px;
+}
+
+.submit-btn {
+    flex: 1;
+    height: 52px;
+    border: none;
+    border-radius: 12px;
+    background-color: var(--accent);
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.cancel-btn {
+    flex: 1;
+    height: 52px;
+    border-radius: 12px;
+    background-color: var(--menu);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.submit-btn:hover {
+    opacity: 0.9;
+}
+
+.cancel-btn:hover {
+    background-color: var(--hover);
+    color: var(--accent);
 }
 </style>
 </head>
@@ -76,24 +161,34 @@ button {
 
 <jsp:include page="/common/header.jsp"/>
 
-<h1>게시글 수정</h1>
+<div class="edit-container">
+    <div class="edit-card">
+        <h1 class="edit-title">게시글 수정</h1>
 
-<form action="<%= request.getContextPath() %>/updatePost" method="post">
-    <input type="hidden" name="post_id" value="<%= postId %>">
+        <form action="<%= request.getContextPath() %>/updatePost" method="post">
+            <input type="hidden" name="post_id" value="<%= postId %>">
 
-    <p>
-        제목<br>
-        <input type="text" name="title" value="<%= title %>" required>
-    </p>
+            <div class="input-group">
+                <label>제목</label>
+                <input type="text" name="title" value="<%= title %>" required>
+            </div>
 
-    <p>
-        내용<br>
-        <textarea name="content" rows="12" required><%= content %></textarea>
-    </p>
+            <div class="input-group">
+                <label>내용</label>
+                <textarea name="content" required><%= content %></textarea>
+            </div>
 
-    <button type="submit">수정 완료</button>
-    <a href="<%= request.getContextPath() %>/board/detail.jsp?post_id=<%= postId %>">취소</a>
-</form>
+            <div class="button-row">
+                <button class="submit-btn" type="submit">수정 완료</button>
+
+                <a class="cancel-btn"
+                   href="<%= request.getContextPath() %>/board/detail.jsp?post_id=<%= postId %>">
+                    취소
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
 
 </body>
 </html>

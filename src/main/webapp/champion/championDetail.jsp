@@ -6,42 +6,127 @@
 <meta charset="UTF-8">
 <title>챔피언 상세</title>
 
+
 <style>
 body {
+    margin: 0;
     font-family: Arial, sans-serif;
-    margin: 30px;
+    background-color: #111827;
+    color: white;
 }
 
-.champion-box {
-    text-align: center;
+.page-container {
+    width: 1100px;
+    margin: 45px auto;
+}
+
+.champion-hero {
+    background-color: #202632;
+    border-radius: 18px;
+    padding: 36px;
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.champion-image-box img {
+    width: 130px;
+    height: 130px;
+    border-radius: 20px;
+}
+
+.champion-info {
+    flex: 1;
+}
+
+.champion-name {
+    color: #42d8b1;
+    font-size: 42px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.champion-title {
+    color: #cbd5e1;
+    font-size: 22px;
+    margin-bottom: 18px;
+}
+
+.champion-lore {
+    color: #d1d5db;
+    line-height: 1.7;
+    font-size: 15px;
+}
+
+.section-card {
+    background-color: #202632;
+    border-radius: 18px;
+    padding: 32px;
+}
+
+.section-title {
+    color: #42d8b1;
+    font-size: 30px;
+    margin: 0 0 24px 0;
 }
 
 .skill-box {
-    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .skill {
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 15px;
+    background-color: #111827;
+    border-radius: 14px;
+    padding: 18px;
     display: flex;
-    gap: 15px;
+    gap: 18px;
     align-items: flex-start;
 }
 
 .skill img {
-    width: 60px;
-    height: 60px;
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    background-color: #374151;
+    flex-shrink: 0;
 }
 
 .skill-name {
+    color: white;
     font-weight: bold;
     font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.skill-key {
+    color: #42d8b1;
 }
 
 .skill-desc {
-    margin-top: 8px;
+    color: #cbd5e1;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.back-menu {
+    margin-top: 24px;
+}
+
+.back-btn {
+    display: inline-block;
+    padding: 12px 18px;
+    border-radius: 10px;
+    background-color: #42d8b1;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.back-btn:hover {
+    background-color: #2fc6a0;
 }
 </style>
 </head>
@@ -50,16 +135,30 @@ body {
 
 <jsp:include page="/common/header.jsp" />
 
-<div class="champion-box">
-    <h2 id="championName"></h2>
-    <img id="championImage" width="120">
-    <h3 id="championTitle"></h3>
-    <p id="championLore"></p>
+<div class="page-container">
+
+    <div class="champion-hero">
+        <div class="champion-image-box">
+            <img id="championImage">
+        </div>
+
+        <div class="champion-info">
+            <div id="championName" class="champion-name"></div>
+            <div id="championTitle" class="champion-title"></div>
+            <div id="championLore" class="champion-lore"></div>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h2 class="section-title">스킬 정보</h2>
+        <div id="skillList" class="skill-box"></div>
+    </div>
+
+    <div class="back-menu">
+        <a class="back-btn" href="championList.jsp">챔피언 목록으로</a>
+    </div>
+
 </div>
-
-<h2>스킬 정보</h2>
-
-<div id="skillList" class="skill-box"></div>
 
 <script>
 var version = "16.11.1";
@@ -70,6 +169,10 @@ var championId = params.get("champion");
 var url = "https://ddragon.leagueoflegends.com/cdn/"
         + version + "/data/ko_KR/champion/"
         + championId + ".json";
+
+function cleanDescription(text) {
+    return text.replace(/<[^>]*>/g, "");
+}
 
 fetch(url)
     .then(function(response) {
@@ -93,8 +196,8 @@ fetch(url)
             '<div class="skill">' +
                 '<img src="https://ddragon.leagueoflegends.com/cdn/' + version + '/img/passive/' + champion.passive.image.full + '">' +
                 '<div>' +
-                    '<div class="skill-name">패시브 - ' + champion.passive.name + '</div>' +
-                    '<div class="skill-desc">' + champion.passive.description + '</div>' +
+                    '<div class="skill-name"><span class="skill-key">패시브</span> - ' + champion.passive.name + '</div>' +
+                    '<div class="skill-desc">' + cleanDescription(champion.passive.description) + '</div>' +
                 '</div>' +
             '</div>';
 
@@ -107,8 +210,8 @@ fetch(url)
                 '<div class="skill">' +
                     '<img src="https://ddragon.leagueoflegends.com/cdn/' + version + '/img/spell/' + spell.image.full + '">' +
                     '<div>' +
-                        '<div class="skill-name">' + keys[i] + ' - ' + spell.name + '</div>' +
-                        '<div class="skill-desc">' + spell.description + '</div>' +
+                        '<div class="skill-name"><span class="skill-key">' + keys[i] + '</span> - ' + spell.name + '</div>' +
+                        '<div class="skill-desc">' + cleanDescription(spell.description) + '</div>' +
                     '</div>' +
                 '</div>';
         }

@@ -17,27 +17,99 @@ if (loginUserId == null) {
 <meta charset="UTF-8">
 <title>내가 쓴 글</title>
 
+
 <style>
 body {
-    width: 900px;
-    margin: auto;
-    font-family: Arial;
-    padding-top: 60px;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #111827;
+    color: white;
 }
 
-table {
+.page-container {
+    width: 1050px;
+    margin: 45px auto;
+}
+
+.page-title {
+    color: #42d8b1;
+    font-size: 34px;
+    margin-bottom: 28px;
+}
+
+.card {
+    background-color: #202632;
+    border-radius: 18px;
+    padding: 32px;
+}
+
+.post-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-th, td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
+.post-table th {
+    color: #42d8b1;
+    padding: 14px 10px;
+    border-bottom: 1px solid #374151;
+}
+
+.post-table td {
+    padding: 15px 10px;
+    border-bottom: 1px solid #374151;
     text-align: center;
+    color: #e5e7eb;
+}
+
+.post-table tr:hover td {
+    background-color: #263142;
 }
 
 .title {
-    text-align: left;
+    text-align: left !important;
+}
+
+.title a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.title a:hover {
+    color: #42d8b1;
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background-color: #2b3444;
+    color: #60a5fa;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.empty-row {
+    color: #cbd5e1;
+    padding: 28px;
+}
+
+.bottom-menu {
+    margin-top: 24px;
+}
+
+.back-btn {
+    display: inline-block;
+    padding: 12px 18px;
+    border-radius: 10px;
+    background-color: #42d8b1;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.back-btn:hover {
+    background-color: #2fc6a0;
 }
 </style>
 </head>
@@ -46,16 +118,18 @@ th, td {
 
 <jsp:include page="/common/header.jsp"/>
 
-<h1>내가 쓴 글</h1>
+<div class="page-container">
+    <h1 class="page-title">내가 쓴 글</h1>
 
-<table>
-<tr>
-    <th>번호</th>
-    <th>카테고리</th>
-    <th>제목</th>
-    <th>조회수</th>
-    <th>작성일</th>
-</tr>
+    <div class="card">
+        <table class="post-table">
+            <tr>
+                <th>번호</th>
+                <th>카테고리</th>
+                <th>제목</th>
+                <th>조회수</th>
+                <th>작성일</th>
+            </tr>
 
 <%
 String sql = "SELECT * FROM board WHERE user_id = ? ORDER BY post_id DESC";
@@ -68,39 +142,59 @@ try (
 
     ResultSet rs = ps.executeQuery();
 
+    boolean hasPost = false;
+
     while (rs.next()) {
+        hasPost = true;
+
+        String category = rs.getString("category");
+        if (category == null || category.trim().equals("")) {
+            category = "자유";
+        }
 %>
 
-<tr>
-    <td><%= rs.getInt("post_id") %></td>
-    <td><%= rs.getString("category") == null ? "자유" : rs.getString("category") %></td>
-    <td class="title">
-        <a href="<%= request.getContextPath() %>/board/detail.jsp?post_id=<%= rs.getInt("post_id") %>">
-            <%= rs.getString("title") %>
-        </a>
-    </td>
-    <td><%= rs.getInt("view_count") %></td>
-    <td><%= rs.getTimestamp("created_at") %></td>
-</tr>
+            <tr>
+                <td><%= rs.getInt("post_id") %></td>
+                <td><span class="category-badge"><%= category %></span></td>
+                <td class="title">
+                    <a href="<%= request.getContextPath() %>/board/detail.jsp?post_id=<%= rs.getInt("post_id") %>">
+                        <%= rs.getString("title") %>
+                    </a>
+                </td>
+                <td><%= rs.getInt("view_count") %></td>
+                <td><%= rs.getTimestamp("created_at") %></td>
+            </tr>
 
 <%
     }
+
+    if (!hasPost) {
+%>
+            <tr>
+                <td class="empty-row" colspan="5">작성한 글이 없습니다.</td>
+            </tr>
+<%
+    }
+
 } catch (Exception e) {
     e.printStackTrace();
 %>
 
-<tr>
-    <td colspan="5">내가 쓴 글을 불러오지 못했습니다.</td>
-</tr>
+            <tr>
+                <td class="empty-row" colspan="5">내가 쓴 글을 불러오지 못했습니다.</td>
+            </tr>
 
 <%
 }
 %>
 
-</table>
+        </table>
 
-<br>
-<a href="<%= request.getContextPath() %>/board/board.jsp">게시판으로 돌아가기</a>
+        <div class="bottom-menu">
+            <a class="back-btn" href="<%= request.getContextPath() %>/board/board.jsp">게시판으로 돌아가기</a>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
