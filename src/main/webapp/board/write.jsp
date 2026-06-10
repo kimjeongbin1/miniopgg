@@ -21,8 +21,8 @@ if (userId == null) {
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #111827;
-    color: white;
+    background-color: var(--bg);
+    color: var(--text);
 }
 
 .write-container {
@@ -31,27 +31,30 @@ body {
 }
 
 .write-card {
-    background-color: #202632;
+    background-color: var(--card);
+    border: 1px solid var(--line);
     border-radius: 18px;
     padding: 36px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
 }
 
 .write-title {
-    color: #42d8b1;
+    color: var(--accent);
     font-size: 34px;
     margin: 0 0 28px 0;
 }
 
 .writer-box {
-    background-color: #111827;
+    background-color: var(--input);
+    border: 1px solid var(--line);
     border-radius: 12px;
     padding: 16px 18px;
     margin-bottom: 22px;
-    color: #cbd5e1;
+    color: var(--subtext);
 }
 
 .writer-box b {
-    color: #42d8b1;
+    color: var(--accent);
 }
 
 .input-group {
@@ -60,7 +63,7 @@ body {
 
 .input-group label {
     display: block;
-    color: #cbd5e1;
+    color: var(--subtext);
     font-weight: bold;
     margin-bottom: 8px;
 }
@@ -69,10 +72,10 @@ body {
 .input-group select,
 .input-group textarea {
     width: 100%;
-    border: none;
+    border: 1px solid var(--line);
     border-radius: 10px;
-    background-color: #111827;
-    color: white;
+    background-color: var(--input);
+    color: var(--text);
     padding: 14px;
     font-size: 16px;
     box-sizing: border-box;
@@ -92,12 +95,12 @@ body {
 .input-group input:focus,
 .input-group select:focus,
 .input-group textarea:focus {
-    border: 2px solid #42d8b1;
+    border: 2px solid var(--accent);
 }
 
 .input-group input::placeholder,
 .input-group textarea::placeholder {
-    color: #9ca3af;
+    color: var(--subtext);
 }
 
 .file-input {
@@ -116,7 +119,7 @@ body {
     height: 52px;
     border: none;
     border-radius: 12px;
-    background-color: #42d8b1;
+    background-color: var(--accent);
     color: white;
     font-size: 17px;
     font-weight: bold;
@@ -128,20 +131,20 @@ body {
     height: 52px;
     border: none;
     border-radius: 12px;
-    background-color: #2b3444;
-    color: #cbd5e1;
+    background-color: var(--menu);
+    color: var(--text);
     font-size: 17px;
     font-weight: bold;
     cursor: pointer;
 }
 
 .submit-btn:hover {
-    background-color: #2fc6a0;
+    opacity: 0.9;
 }
 
 .cancel-btn:hover {
-    background-color: #374151;
-    color: white;
+    background-color: var(--hover);
+    color: var(--accent);
 }
 </style>
 

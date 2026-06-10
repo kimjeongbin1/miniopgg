@@ -19,8 +19,8 @@ if (userId == null) {
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #111827;
-    color: white;
+    background-color: var(--bg);
+    color: var(--text);
 }
 
 .page-container {
@@ -32,14 +32,16 @@ body {
 
 .password-card {
     width: 480px;
-    background-color: #202632;
+    background-color: var(--card);
+    border: 1px solid var(--line);
     border-radius: 18px;
     padding: 42px 38px;
     box-sizing: border-box;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
 }
 
 .password-title {
-    color: #42d8b1;
+    color: var(--accent);
     font-size: 30px;
     text-align: center;
     margin-bottom: 30px;
@@ -52,7 +54,7 @@ body {
 
 .input-group label {
     display: block;
-    color: #cbd5e1;
+    color: var(--subtext);
     font-weight: bold;
     margin-bottom: 8px;
 }
@@ -60,10 +62,10 @@ body {
 .input-group input {
     width: 100%;
     height: 50px;
-    border: none;
+    border: 1px solid var(--line);
     border-radius: 10px;
-    background-color: #111827;
-    color: white;
+    background-color: var(--input);
+    color: var(--text);
     padding: 0 15px;
     font-size: 16px;
     box-sizing: border-box;
@@ -71,7 +73,7 @@ body {
 }
 
 .input-group input:focus {
-    border: 2px solid #42d8b1;
+    border: 2px solid var(--accent);
 }
 
 .button-row {
@@ -85,7 +87,7 @@ body {
     height: 50px;
     border: none;
     border-radius: 10px;
-    background-color: #42d8b1;
+    background-color: var(--accent);
     color: white;
     font-weight: bold;
     font-size: 16px;
@@ -96,8 +98,8 @@ body {
     flex: 1;
     height: 50px;
     border-radius: 10px;
-    background-color: #2b3444;
-    color: #cbd5e1;
+    background-color: var(--menu);
+    color: var(--text);
     text-decoration: none;
     font-weight: bold;
     display: flex;
@@ -106,12 +108,12 @@ body {
 }
 
 .submit-btn:hover {
-    background-color: #2fc6a0;
+    opacity: 0.9;
 }
 
 .cancel-btn:hover {
-    background-color: #374151;
-    color: white;
+    background-color: var(--hover);
+    color: var(--accent);
 }
 </style>
 </head>

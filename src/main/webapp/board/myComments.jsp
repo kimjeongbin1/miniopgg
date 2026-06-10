@@ -22,8 +22,8 @@ if (loginUserId == null) {
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #111827;
-    color: white;
+    background-color: var(--bg);
+    color: var(--text);
 }
 
 .page-container {
@@ -32,15 +32,17 @@ body {
 }
 
 .page-title {
-    color: #42d8b1;
+    color: var(--accent);
     font-size: 34px;
     margin-bottom: 28px;
 }
 
 .card {
-    background-color: #202632;
+    background-color: var(--card);
+    border: 1px solid var(--line);
     border-radius: 18px;
     padding: 32px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
 }
 
 .comment-table {
@@ -49,20 +51,20 @@ body {
 }
 
 .comment-table th {
-    color: #42d8b1;
+    color: var(--accent);
     padding: 14px 10px;
-    border-bottom: 1px solid #374151;
+    border-bottom: 1px solid var(--line);
 }
 
 .comment-table td {
     padding: 15px 10px;
-    border-bottom: 1px solid #374151;
+    border-bottom: 1px solid var(--line);
     text-align: center;
-    color: #e5e7eb;
+    color: var(--text);
 }
 
 .comment-table tr:hover td {
-    background-color: #263142;
+    background-color: var(--hover) !important;
 }
 
 .content {
@@ -75,17 +77,17 @@ body {
 }
 
 .post-title a {
-    color: white;
+    color: var(--text);
     text-decoration: none;
     font-weight: bold;
 }
 
 .post-title a:hover {
-    color: #42d8b1;
+    color: var(--accent);
 }
 
 .empty-row {
-    color: #cbd5e1;
+    color: var(--subtext);
     padding: 28px;
 }
 
@@ -97,14 +99,14 @@ body {
     display: inline-block;
     padding: 12px 18px;
     border-radius: 10px;
-    background-color: #42d8b1;
+    background-color: var(--accent);
     color: white;
     text-decoration: none;
     font-weight: bold;
 }
 
 .back-btn:hover {
-    background-color: #2fc6a0;
+    opacity: 0.9;
 }
 </style>
 </head>

@@ -22,8 +22,8 @@ if (userId == null) {
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #111827;
-    color: white;
+    background-color: var(--bg);
+    color: var(--text);
 }
 
 .page-container {
@@ -32,15 +32,17 @@ body {
 }
 
 .page-title {
-    color: #42d8b1;
+    color: var(--accent);
     font-size: 34px;
     margin-bottom: 28px;
 }
 
 .card {
-    background-color: #202632;
+    background-color: var(--card);
+    border: 1px solid var(--line);
     border-radius: 18px;
     padding: 32px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
 }
 
 .favorite-table {
@@ -49,20 +51,20 @@ body {
 }
 
 .favorite-table th {
-    color: #42d8b1;
+    color: var(--accent);
     padding: 14px 10px;
-    border-bottom: 1px solid #374151;
+    border-bottom: 1px solid var(--line);
 }
 
 .favorite-table td {
     padding: 15px 10px;
-    border-bottom: 1px solid #374151;
+    border-bottom: 1px solid var(--line);
     text-align: center;
-    color: #e5e7eb;
+    color: var(--text);
 }
 
 .favorite-table tr:hover td {
-    background-color: #263142;
+    background-color: var(--hover) !important;
 }
 
 .title {
@@ -70,27 +72,27 @@ body {
 }
 
 .title a {
-    color: white;
+    color: var(--text);
     text-decoration: none;
     font-weight: bold;
 }
 
 .title a:hover {
-    color: #42d8b1;
+    color: var(--accent);
 }
 
 .category-badge {
     display: inline-block;
     padding: 6px 10px;
     border-radius: 999px;
-    background-color: #2b3444;
+    background-color: var(--menu);
     color: #60a5fa;
     font-size: 13px;
     font-weight: bold;
 }
 
 .empty-row {
-    color: #cbd5e1;
+    color: var(--subtext);
     padding: 28px;
 }
 
@@ -102,14 +104,14 @@ body {
     display: inline-block;
     padding: 12px 18px;
     border-radius: 10px;
-    background-color: #42d8b1;
+    background-color: var(--accent);
     color: white;
     text-decoration: none;
     font-weight: bold;
 }
 
 .back-btn:hover {
-    background-color: #2fc6a0;
+    opacity: 0.9;
 }
 </style>
 </head>
@@ -129,7 +131,7 @@ body {
                 <th>제목</th>
                 <th>작성자</th>
                 <th>조회수</th>
-                <th>즐겨찾기일</th>
+                <th>저장된 시간</th>
             </tr>
 
 <%

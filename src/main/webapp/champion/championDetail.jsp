@@ -11,8 +11,8 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #111827;
-    color: white;
+    background-color: var(--bg);
+    color: var(--text);
 }
 
 .page-container {
@@ -21,13 +21,15 @@ body {
 }
 
 .champion-hero {
-    background-color: #202632;
+    background-color: var(--card);
+    border: 1px solid var(--line);
     border-radius: 18px;
     padding: 36px;
     display: flex;
     gap: 28px;
     align-items: center;
     margin-bottom: 30px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
 }
 
 .champion-image-box img {
@@ -41,32 +43,34 @@ body {
 }
 
 .champion-name {
-    color: #42d8b1;
+    color: var(--accent);
     font-size: 42px;
     font-weight: bold;
     margin-bottom: 8px;
 }
 
 .champion-title {
-    color: #cbd5e1;
+    color: var(--subtext);
     font-size: 22px;
     margin-bottom: 18px;
 }
 
 .champion-lore {
-    color: #d1d5db;
+    color: var(--text);
     line-height: 1.7;
     font-size: 15px;
 }
 
 .section-card {
-    background-color: #202632;
+    background-color: var(--card);
+    border: 1px solid var(--line);
     border-radius: 18px;
     padding: 32px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
 }
 
 .section-title {
-    color: #42d8b1;
+    color: var(--accent);
     font-size: 30px;
     margin: 0 0 24px 0;
 }
@@ -78,7 +82,8 @@ body {
 }
 
 .skill {
-    background-color: #111827;
+    background-color: var(--input);
+    border: 1px solid var(--line);
     border-radius: 14px;
     padding: 18px;
     display: flex;
@@ -90,23 +95,23 @@ body {
     width: 64px;
     height: 64px;
     border-radius: 12px;
-    background-color: #374151;
+    background-color: var(--menu);
     flex-shrink: 0;
 }
 
 .skill-name {
-    color: white;
+    color: var(--text);
     font-weight: bold;
     font-size: 18px;
     margin-bottom: 8px;
 }
 
 .skill-key {
-    color: #42d8b1;
+    color: var(--accent);
 }
 
 .skill-desc {
-    color: #cbd5e1;
+    color: var(--subtext);
     line-height: 1.6;
     font-size: 14px;
 }
@@ -119,14 +124,14 @@ body {
     display: inline-block;
     padding: 12px 18px;
     border-radius: 10px;
-    background-color: #42d8b1;
+    background-color: var(--accent);
     color: white;
     text-decoration: none;
     font-weight: bold;
 }
 
 .back-btn:hover {
-    background-color: #2fc6a0;
+    opacity: 0.9;
 }
 </style>
 </head>

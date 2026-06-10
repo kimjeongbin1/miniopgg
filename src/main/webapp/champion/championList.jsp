@@ -10,8 +10,8 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #111827;
-    color: white;
+    background-color: var(--bg);
+    color: var(--text);
 }
 
 .page-container {
@@ -21,7 +21,7 @@ body {
 
 .page-title {
     text-align: center;
-    color: #42d8b1;
+    color: var(--accent);
     font-size: 42px;
     margin-bottom: 35px;
 }
@@ -34,12 +34,21 @@ body {
 .search-box input {
     width: 400px;
     height: 50px;
-    border: none;
+    border: 1px solid var(--line);
     border-radius: 10px;
-    background: #202632;
-    color: white;
+    background: var(--input);
+    color: var(--text);
     padding: 0 15px;
     font-size: 16px;
+    outline: none;
+}
+
+.search-box input:focus {
+    border: 2px solid var(--accent);
+}
+
+.search-box input::placeholder {
+    color: var(--subtext);
 }
 
 #championList {
@@ -49,17 +58,20 @@ body {
 }
 
 .champion-card {
-    background-color: #202632;
+    background-color: var(--card);
+    border: 1px solid var(--line);
     border-radius: 14px;
     padding: 15px;
     text-align: center;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
 }
 
 .champion-card:hover {
     transform: translateY(-5px);
-    background-color: #2a3445;
+    background-color: var(--hover);
+    border-color: var(--accent);
 }
 
 .champion-card img {
@@ -72,7 +84,7 @@ body {
     margin-top: 12px;
     font-size: 15px;
     font-weight: bold;
-    color: white;
+    color: var(--text);
 }
 </style>
 </head>
